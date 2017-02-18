@@ -1,17 +1,14 @@
 #include "AppleMidi.h" //https://github.com/lathoub/Arduino-AppleMidi-Library
 
-//unsigned long t0 = millis();
-
 bool rtpMidiIsConnected = false;
 
 APPLEMIDI_CREATE_INSTANCE(WiFiUDP, AppleMIDI); // see definition in AppleMidi_Defs.h
 
 void rtpMidiSetup() {
-  
+  if (configuration.rtpMidiEnabled) {
   Serial.println("RTPMidi on port 5004");
   
-  //todo use global unique name
-  AppleMIDI.begin("oscpixi");
+  AppleMIDI.begin(myName);
 
   AppleMIDI.OnConnected(rtpMidiConnected);
   AppleMIDI.OnDisconnected(rtpMidiDisconnected);
@@ -19,12 +16,15 @@ void rtpMidiSetup() {
   AppleMIDI.OnReceiveNoteOn(rtpMidiOnNoteOn);
   AppleMIDI.OnReceiveNoteOff(rtpMidiOnNoteOff);
   AppleMIDI.OnReceiveControlChange(rtpMidiOnControlChange);
+  }
 }
 
 
 void rtpMidiLoop() {
   // Listen for incoming messages
+  if (configuration.rtpMidiEnabled) {
   AppleMIDI.run();
+  }
 }
 
 

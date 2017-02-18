@@ -11,13 +11,13 @@
 Pixi pixi;
 
 // value for the pin [0-4096]
-float pinValues[20] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+//float pinValues[20] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 //pin mode. see OUTPUT_ and INPUT_ constants
-word pinModes[20] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+//word pinModes[20] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 //LFO
-word lfoModes[20] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-word lfoPhases[20] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+//word lfoModes[20] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+//word lfoPhases[20] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 //count to zero until zero to generate trig of N ms. see OUTPUT_TRIG_LENGTH
 word pinTrigCyles[20] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -31,7 +31,7 @@ void setupPixi() {
 
     //init all ports. 
     for (int i = 0; i < 20; i++) {
-      setChannel( i, pinModes[20], 0 );
+      setChannel( i, configuration.pinModes[20], 0 );
     }
 
   } else {
@@ -43,10 +43,10 @@ void setupPixi() {
 
 void setChannel(int channel, int modee, float value) {
   //set channel config
-  if (modee != pinModes[channel]) {
+  if (modee != configuration.pinModes[channel]) {
     int range = (modee < 50 || modee >= 100 && modee < 150) ? CH_0_TO_10P : CH_5N_TO_5P;
     int channelMode = modee < 100 ? CH_MODE_DAC : CH_MODE_ADC_P;
-    pinModes[channel] = modee;
+    configuration.pinModes[channel] = modee;
     pixi.configChannel(channel, channelMode, 0, range, 0);
 
     if (debug) {
@@ -89,16 +89,16 @@ void setChannel(int channel, int modee, float value) {
   //update pixi value based on mode
   switch (modee) {
     case  OUTPUT_MODE_GATE:
-      pinValues[channel] = value > 0.5 ? OUTPUT_TRIG_HIGH : OUTPUT_TRIG_LOW;
+      configuration.pinValues[channel] = value > 0.5 ? OUTPUT_TRIG_HIGH : OUTPUT_TRIG_LOW;
       break;
     case  OUTPUT_MODE_TRIG:
       pinTrigCyles[channel] = OUTPUT_TRIG_LENGTH;
       break;
     case  OUTPUT_MODE_CVUNI:
-      pinValues[channel] = value < 0 ? 0 : value > 1 ? 4096 : value * 4096;
+      configuration.pinValues[channel] = value < 0 ? 0 : value > 1 ? 4096 : value * 4096;
       break;
     case  OUTPUT_MODE_CVBI:
-      pinValues[channel] = value < -1 ? 0 : value > 1 ? 4096 : value * 2048 + 2048;
+      configuration.pinValues[channel] = value < -1 ? 0 : value > 1 ? 4096 : value * 2048 + 2048;
       break;
   }
 
@@ -140,7 +140,7 @@ void setChannel(int channel, int modee, float value) {
     Serial.print(" ");
     Serial.print(value);
     Serial.print(" -> ");
-    Serial.println(pinValues[channel]);
+    Serial.println(configuration.pinValues[channel]);
   }
 
 }
@@ -153,18 +153,18 @@ inline void updatePixi() {
   for (int i = 0; i < 20; i++) {
 
     //trigger mode
-    if (OUTPUT_MODE_TRIG == pinModes[i]) {
+    if (OUTPUT_MODE_TRIG == configuration.pinModes[i]) {
       if (pinTrigCyles[i] > 0) {
-        pinValues[i] =  OUTPUT_TRIG_HIGH;
+        configuration.pinValues[i] =  OUTPUT_TRIG_HIGH;
         pinTrigCyles[i]--;
       } else {
-        pinValues[i] = OUTPUT_TRIG_LOW;
+        configuration.pinValues[i] = OUTPUT_TRIG_LOW;
       }
     }
 
-    if (pinModes[i] <  100) {
+    if (configuration.pinModes[i] <  100) {
       //pixi.writeAnalog (i, pinValues[i]);
-      pixi.WriteRegister( PIXI_DAC_DATA + i, pinValues[i] );
+      pixi.WriteRegister( PIXI_DAC_DATA + i, configuration.pinValues[i] );
       //}else{
       //    pinValues[i] = pixi.readAnalog(i) > 0;
     }

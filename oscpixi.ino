@@ -1,28 +1,21 @@
 /*
   TODO :
-  - WIFI 
-    - settings web ui
-    - flash save
   - RTP MIDI
     - update RTP MIDI to use pixi functions
     - web ui help for osc
     - save config in flash
     - load config from flash
   - pixi
-    - save config in flash
-    - load config from flash
     - LFOs
     - RANDOM S/H
     - flip / flop
     - timer for pixi write
     - trigger / gate detection
-    - cv in 
+    - cv in
   - OSC
-    - save config in flash
-    - load config from flash
     - sending message to remote host
- */
- 
+*/
+
 
 
 #include <pgmspace.h> //PROGMEM
@@ -52,33 +45,40 @@
 
 
 //used to build a unique named based on mac
-char* myName="oscpixi-XXXXXX";
+char* myName = "oscpixi-XXXXXX";
 
 //will enable some Serial.print
 bool debug = true;
 
 
 void setup() {
-  
+
   //basic stuff
   Serial.begin(115200);
+  Serial.print("\n\n");
   randomSeed(analogRead(0));
   pinMode(LED_BUILTIN, OUTPUT);
 
+
   //unique name
   setupUniqueName();
-  Serial.print("\n\n");
   Serial.print(myName);
   Serial.println(" starting.");
+
+  loadConfiguration();
   
   setupWifi();
-  //delay(500);
+  delay(500);
   setupMDNS();
   setupPixi();
   createWebServerRoutes();
   startWebServer();
-  setupUDPServer();
+  setupOSCServer();
   rtpMidiSetup();
+
+  //when to save config ?
+  //saveConfiguration();
+
 }
 
 

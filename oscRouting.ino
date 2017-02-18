@@ -5,48 +5,50 @@
 #include <OSCData.h>
 WiFiUDP Udp;
 
-const unsigned int oscPort = 5000;
 
-
-void setupUDPServer() {
-  Udp.begin(oscPort);
-  Serial.print("OSC on port ");
-  Serial.println(Udp.localPort());
+void setupOSCServer() {
+  if (configuration.oscEnabled) {
+    Udp.begin(configuration.oscPort);
+    Serial.print("OSC on port ");
+    Serial.println(Udp.localPort());
+  }
 }
 
 
 void receiveOSCMessage() {
-  OSCErrorCode error;
-  OSCBundle bundle;
-  OSCMessage message;
-  int size = Udp.parsePacket();
-  bool first = true;
-  bool isMessage = false;
-  if (size > 0) {
-    while (size--) {
-      uint8_t i = Udp.read();
-      //detect if this is a bundle or a single OSC message
-      if (first && i == '/') {
-        isMessage = true;
+  if (configuration.oscEnabled) {
+    OSCErrorCode error;
+    OSCBundle bundle;
+    OSCMessage message;
+    int size = Udp.parsePacket();
+    bool first = true;
+    bool isMessage = false;
+    if (size > 0) {
+      while (size--) {
+        uint8_t i = Udp.read();
+        //detect if this is a bundle or a single OSC message
+        if (first && i == '/') {
+          isMessage = true;
+        }
+        first = false;
+        if (isMessage) {
+          message.fill(i);
+        } else {
+          bundle.fill(i);
+        }
       }
-      first = false;
       if (isMessage) {
-        message.fill(i);
+        message.route("/out", oscOutMsg);
+        message.route("/in", oscInMsg);
       } else {
-        bundle.fill(i);
-      }
-    }
-    if (isMessage) {
-      message.route("/out", oscOutMsg);
-      message.route("/in", oscInMsg);
-    } else {
-      if (!bundle.hasError()) {
-        bundle.route("/out", oscOutMsg);
-        bundle.route("/in", oscInMsg);
-      } else {
-        error = bundle.getError();
-        Serial.print("error in osc bundle: ");
-        Serial.println(error);
+        if (!bundle.hasError()) {
+          bundle.route("/out", oscOutMsg);
+          bundle.route("/in", oscInMsg);
+        } else {
+          error = bundle.getError();
+          Serial.print("error in osc bundle: ");
+          Serial.println(error);
+        }
       }
     }
   }
