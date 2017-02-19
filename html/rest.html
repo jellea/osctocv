@@ -1,0 +1,105 @@
+<html>
+<title>OSCPixi</title>
+<link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' crossorigin='anonymous'>
+<div class='container' style='width:450px;margin20px;padding:20px'>
+
+	<nav class='navbar navbar-default'>
+		<div class='container-fluid'>
+			<div class='collapse navbar-collapse'>
+			  <ul class='nav navbar-nav'>
+			 	<li><a href='/'>OSCPixi</a><li>
+				<li class='active'><a href='/rest'>Rest API</a></li>
+				<li><a href='/wifi'>WLAN</a></li>
+			  </ul>
+			</div>
+		</div>
+	</nav>	
+	
+	<h2>outputs</h2>
+	<form action='/out' target='resultoutput'>
+		<div class='form-group'>
+			channel<br/>
+			<input type='radio' name='channel' id='co1' value='1'/>&nbsp;<label for='co1'>1</label>
+			<input type='radio' name='channel' id='co2' value='2'/>&nbsp;<label for='co2'>2</label>
+			<input type='radio' name='channel' id='co3' value='3'/>&nbsp;<label for='co3'>3</label>
+			<input type='radio' name='channel' id='co4' value='4'/>&nbsp;<label for='co4'>4</label>
+			<input type='radio' name='channel' id='co5' value='5'/>&nbsp;<label for='co5'>5</label>
+			<input type='radio' name='channel' id='co6' value='6'/>&nbsp;<label for='co6'>6</label>
+			<input type='radio' name='channel' id='co7' value='7'/>&nbsp;<label for='co7'>7</label>
+			<input type='radio' name='channel' id='co8' value='8'/>&nbsp;<label for='co8'>8</label>
+			<input type='radio' name='channel' id='co9' value='9'/>&nbsp;<label for='co9'>9</label>
+			<input type='radio' name='channel' id='co10' value='10'/>&nbsp;<label for='co10'>10</label>
+			<input type='radio' name='channel' id='co11' value='11'/>&nbsp;<label for='co12'>11</label>
+			<input type='radio' name='channel' id='co12' value='12'/>&nbsp;<label for='co13'>12</label>
+			<input type='radio' name='channel' id='co13' value='13'/>&nbsp;<label for='co13'>13</label>
+			<input type='radio' name='channel' id='co14' value='14'/>&nbsp;<label for='co14'>14</label>
+			<input type='radio' name='channel' id='co15' value='15'/>&nbsp;<label for='co15'>15</label>
+			<input type='radio' name='channel' id='co16' value='16'/>&nbsp;<label for='co16'>16</label>
+			<input type='radio' name='channel' id='co17' value='17'/>&nbsp;<label for='co17'>17</label>
+			<input type='radio' name='channel' id='co18' value='18'/>&nbsp;<label for='co18'>18</label>
+			<input type='radio' name='channel' id='co19' value='19'/>&nbsp;<label for='co19'>19</label>
+			<input type='radio' name='channel' id='co20' value='20'/>&nbsp;<label for='co20'>20</label>
+		</div>
+		<div class='form-group'>
+			mode<br/>
+			<input type='radio' name='mode' id='mo1' value='trig'/>&nbsp;<label for='mo1'>trigger</label>
+			<input type='radio' name='mode' id='mo2' value='gate'/>&nbsp;<label for='mo2'>gate</label>
+			<input type='radio' name='mode' id='mo3' value='cvuni'/>&nbsp;<label for='mo3'>unipolar cv (0v +10v)</label>
+			<input type='radio' name='mode' id='mo4' value='cvbi'/>&nbsp;<label for='mo4'>biploar cv (-5v +5v)</label>
+			<input type='radio' name='mode' id='mo5' value='lfoSine'/>&nbsp;<label for='mo5'>sine&nbsp;lfo</label>
+			<input type='radio' name='mode' id='mo6' value='lfoSaw'/>&nbsp;<label for='mo6'>saw&nbsp;lfo</label>
+			<input type='radio' name='mode' id='mo7' value='lfoRamp'/>&nbsp;<label for='mo7'>ramp&nbsp;lfo</label>
+			<input type='radio' name='mode' id='mo8' value='lfoTri'/>&nbsp;<label for='mo8'>triangle&nbsp;lfo</label>
+			<input type='radio' name='mode' id='mo9' value='lfoSquare'/>&nbsp;<label for='mo9'>square&nbsp;lfo</label>
+		</div>
+		<div class='form-group'>
+			<label for='value'>value</label>
+			<input name='value' id='value' class='form-control' placeholder='[0, 1] for unipolar, [-1, 1] for bipolar, frequency (Hz) for LFOs'/>
+		</div>
+		<input type='submit'/>
+	</form>
+	<iframe src='' name='resultoutput' style='border:none;width:250px;height:40px;'></iframe>
+
+	<h2>inputs</h2>
+	<form action='/in' target='resultinput'>
+		<div class='form-group'>
+			channel<br/>
+			<input type='radio' name='channel' id='ci1' value='1'/>&nbsp;<label for='ci1'>1</label>
+			<input type='radio' name='channel' id='ci2' value='2'/>&nbsp;<label for='ci2'>2</label>
+			<input type='radio' name='channel' id='ci3' value='3'/>&nbsp;<label for='ci3'>3</label>
+			<input type='radio' name='channel' id='ci4' value='4'/>&nbsp;<label for='ci4'>4</label>
+			<input type='radio' name='channel' id='ci5' value='5'/>&nbsp;<label for='ci5'>5</label>
+			<input type='radio' name='channel' id='ci6' value='6'/>&nbsp;<label for='ci6'>6</label>
+			<input type='radio' name='channel' id='ci7' value='7'/>&nbsp;<label for='ci7'>7</label>
+			<input type='radio' name='channel' id='ci8' value='8'/>&nbsp;<label for='ci8'>8</label>
+			<input type='radio' name='channel' id='ci9' value='9'/>&nbsp;<label for='ci9'>9</label>
+			<input type='radio' name='channel' id='ci10' value='10'/>&nbsp;<label for='ci10'>10</label>
+			<input type='radio' name='channel' id='ci11' value='11'/>&nbsp;<label for='ci12'>11</label>
+			<input type='radio' name='channel' id='ci12' value='12'/>&nbsp;<label for='ci13'>12</label>
+			<input type='radio' name='channel' id='ci13' value='13'/>&nbsp;<label for='ci13'>13</label>
+			<input type='radio' name='channel' id='ci14' value='14'/>&nbsp;<label for='ci14'>14</label>
+			<input type='radio' name='channel' id='ci15' value='15'/>&nbsp;<label for='ci15'>15</label>
+			<input type='radio' name='channel' id='ci16' value='16'/>&nbsp;<label for='ci16'>16</label>
+			<input type='radio' name='channel' id='ci17' value='17'/>&nbsp;<label for='ci17'>17</label>
+			<input type='radio' name='channel' id='ci18' value='18'/>&nbsp;<label for='ci18'>18</label>
+			<input type='radio' name='channel' id='ci19' value='19'/>&nbsp;<label for='ci19'>19</label>
+			<input type='radio' name='channel' id='ci20' value='20'/>&nbsp;<label for='ci20'>20</label>
+		</div>
+		<div class='form-group'>
+			mode<br/>
+			<input type='radio' name='mode' id='mi1' value='trig'/>&nbsp;<label for='mi1'>trigger</label>
+			<input type='radio' name='mode' id='mi2' value='gate'/>&nbsp;<label for='mi2'>gate</label>
+			<input type='radio' name='mode' id='mi3' value='cvuni'/>&nbsp;<label for='mi3'>unipolar cv (0v +10v)</label>
+			<input type='radio' name='mode' id='mi4' value='cvbi'/>&nbsp;<label for='mi4'>biploar cv (-5v +5v)</label>
+		</div>
+		<div class='form-group'>
+			<label for='value'>host</label>
+			<input name='host' id='host' class='form-control' placeholder='hostname or ip address'/>
+			<input name='port' id='port' class='form-control' placeholder='port (udp)'/>
+		</div>
+		<input type='submit'/>
+	</form>
+	<iframe src='' name='resultinput' style='border:none;width:250px;height:40px;'></iframe>
+
+</div>
+<html>
