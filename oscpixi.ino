@@ -17,8 +17,6 @@
     - sending message to remote host
 */
 
-
-
 #include <pgmspace.h> //PROGMEM
 
 #include <OSCMessage.h> // dependency: https://github.com/CNMAT/OSC

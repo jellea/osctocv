@@ -8,7 +8,7 @@ ESP8266WiFiMulti WiFiMulti;
 
 
 void setupWifi() {
-  
+
   if (!configuration.wifiAPMode) {
     //wifi client
     WiFiMulti.addAP(configuration.wifiSSID, configuration.wifiPassword);
@@ -31,9 +31,7 @@ void setupWifi() {
       Serial.print(configuration.wifiSSID);
       Serial.print(" with IP ");
       Serial.println(WiFi.localIP());
-
     }
-
   } else {
     setupWifiAP();
   }
@@ -54,13 +52,12 @@ void setupWifiAP() {
 }
 
 void setupMDNS() {
-
   if (!MDNS.begin(myName)) {
     Serial.println("Error setting up MDNS responder!");
   } else {
     Serial.println("mDNS responder started");
     MDNS.addService("http", "tcp", 80);
-    MDNS.addService("osc", "udp", 5000);//http://opensoundcontrol.org/files/Rendezvous-OSC.pdf "_osc._udp."
+    MDNS.addService("osc", "udp", 5000);
     MDNS.addService("midi", "udp", 5004);
   }
 }
@@ -70,13 +67,12 @@ void setupUniqueName() {
   //unique name
   uint8_t mac[WL_MAC_ADDR_LENGTH];
   WiFi.softAPmacAddress(mac);
-  String macID = String(mac[WL_MAC_ADDR_LENGTH - 2], HEX) +
-                 String(mac[WL_MAC_ADDR_LENGTH - 1], HEX);
-  macID.toUpperCase();
+  String macID = String(mac[WL_MAC_ADDR_LENGTH - 2], HEX) + String(mac[WL_MAC_ADDR_LENGTH - 1], HEX);
+  macID.toLowerCase();
   String n = "oscpixi-" + macID;
-  //char AP_NameChar[n.length() + 1];
   memset(myName, 0, n.length() + 1);
-  for (int i = 0; i < n.length(); i++)
+  for (int i = 0; i < n.length()-1; i++)
     myName[i] = n.charAt(i);
-   WiFi.hostname(myName);
+  myName[n.length()-1] = 0;
+  WiFi.hostname(myName);
 }

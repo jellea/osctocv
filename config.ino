@@ -71,9 +71,11 @@ void loadConfiguration() {
 }
 
 void saveConfiguration(boolean force) {
+  noInterrupts();
   //when to save config ?
   if (configurationNeedsSave || force) {
     if (millis() - configurationLastSave > 1000 * 60 || force) {
+      configurationLastSave = millis();
       for (unsigned int t = 0; t < sizeof(configuration); t++) {
         EEPROM.write(CONFIG_START + t, *((char*)&configuration + t));
       }
@@ -81,7 +83,7 @@ void saveConfiguration(boolean force) {
       Serial.println("saved configuration in EEPROM.");
     }
   }
-
+  interrupts();
 }
 
 
