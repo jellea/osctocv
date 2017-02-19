@@ -1,17 +1,18 @@
 /*
   TODO :
   - RTP MIDI
-    - update RTP MIDI to use pixi functions
-    - web ui help for osc
+    - default mappings
+    - web and readme help
+    - 14 bits midi cc support
     - save config in flash
     - load config from flash
+    - mdns discovery
   - pixi
     - LFOs
     - RANDOM S/H
     - flip / flop
-    - timer for pixi write
     - trigger / gate detection
-    - cv in
+    - cv in ->
   - OSC
     - sending message to remote host
 */
@@ -21,6 +22,10 @@
 #include <pgmspace.h> //PROGMEM
 
 #include <OSCMessage.h> // dependency: https://github.com/CNMAT/OSC
+#include <Ticker.h>
+
+Ticker ticker;
+
 
 //
 #define OUTPUT_MODE_GATE 1
@@ -34,7 +39,8 @@
 #define OUTPUT_MODE_LFO_SQUARE 51
 #define OUTPUT_MODE_LFO_SAW 52
 #define OUTPUT_MODE_LFO_RAMP 53
-#define OUTPUT_MODE_LFO_SINE 54
+#define OUTPUT_MODE_LFO_TRI 55
+#define OUTPUT_MODE_LFO_SINE 56
 
 #define INPUT_MODE_GATE 100
 #define INPUT_MODE_TRIG 101
@@ -43,12 +49,13 @@
 #define INPUT_MODE_CVBI 150
 
 
-
 //used to build a unique named based on mac
 char* myName = "oscpixi-XXXXXX";
 
 //will enable some Serial.print
 bool debug = true;
+
+unsigned long lastTimer = 0;
 
 
 void setup() {
@@ -59,26 +66,39 @@ void setup() {
   randomSeed(analogRead(0));
   pinMode(LED_BUILTIN, OUTPUT);
 
-
   //unique name
   setupUniqueName();
   Serial.print(myName);
   Serial.println(" starting.");
 
   loadConfiguration();
-  
+
   setupWifi();
-  delay(500);
+  //delay(500);
   setupMDNS();
   setupPixi();
   createWebServerRoutes();
   startWebServer();
   setupOSCServer();
-  rtpMidiSetup();
+  setupRtpMidi();
+  setupTimer();
+}
 
-  //when to save config ?
-  //saveConfiguration();
 
+void inline onTimer() {
+  unsigned long now = millis();
+  if (lastTimer != 0 && now - lastTimer > 2){
+    Serial.print("timer underrun. last run was ");
+    Serial.print(now - lastTimer);
+    Serial.println("ms ago.");
+  }
+  lastTimer = now;
+  //
+  updatePixi();
+}
+
+void setupTimer() {
+  ticker.attach_ms(1, onTimer);
 }
 
 
@@ -87,9 +107,21 @@ void loop() {
   receiveOSCMessage();
   handleWebClient();
   rtpMidiLoop();
-  //TODO: use timer for updatePixi
-  updatePixi();
+  
+  saveConfiguration(false);
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

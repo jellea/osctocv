@@ -1,21 +1,20 @@
 #include "AppleMidi.h" //https://github.com/lathoub/Arduino-AppleMidi-Library
 
 bool rtpMidiIsConnected = false;
-
 APPLEMIDI_CREATE_INSTANCE(WiFiUDP, AppleMIDI); // see definition in AppleMidi_Defs.h
 
-void rtpMidiSetup() {
+void setupRtpMidi() {
   if (configuration.rtpMidiEnabled) {
-  Serial.println("RTPMidi on port 5004");
-  
-  AppleMIDI.begin(myName);
+    Serial.println("RTPMidi on port 5004");
 
-  AppleMIDI.OnConnected(rtpMidiConnected);
-  AppleMIDI.OnDisconnected(rtpMidiDisconnected);
-  
-  AppleMIDI.OnReceiveNoteOn(rtpMidiOnNoteOn);
-  AppleMIDI.OnReceiveNoteOff(rtpMidiOnNoteOff);
-  AppleMIDI.OnReceiveControlChange(rtpMidiOnControlChange);
+    AppleMIDI.begin(myName);
+
+    AppleMIDI.OnConnected(rtpMidiConnected);
+    AppleMIDI.OnDisconnected(rtpMidiDisconnected);
+
+    //AppleMIDI.OnReceiveNoteOn(rtpMidiOnNoteOn);
+    //AppleMIDI.OnReceiveNoteOff(rtpMidiOnNoteOff);
+    AppleMIDI.OnReceiveControlChange(rtpMidiOnControlChange);
   }
 }
 
@@ -23,7 +22,7 @@ void rtpMidiSetup() {
 void rtpMidiLoop() {
   // Listen for incoming messages
   if (configuration.rtpMidiEnabled) {
-  AppleMIDI.run();
+    AppleMIDI.run();
   }
 }
 
@@ -55,13 +54,34 @@ void rtpMidiOnNoteOff(byte channel, byte note, byte velocity) {
   Serial.println(velocity);
 }
 
-void rtpMidiOnControlChange(byte channel, byte controller, byte value) {
-  Serial.print("RTPMIDI : cc :");
+
+
+void rtpMidiOnControlChange(byte midiChannel, byte controller, byte midiValue) {
+  if (midiChannel == configuration.rtpMidiChannel || midiChannel == configuration.rtpMidiChannel + 1){
+      int modeIndex = controller%10;
+      int channel = controller/10 + (midiChannel == configuration.rtpMidiChannel + 1)?10:0;
+      float value = midiValue/127.0;
+      int modee = 0;
+      switch(modeIndex){
+           case 0: modee=OUTPUT_MODE_GATE;break;
+           case 1: modee=OUTPUT_MODE_TRIG;break;
+           case 2: modee=OUTPUT_MODE_CVUNI;break;
+           case 3: modee=OUTPUT_MODE_CVBI;break;
+           case 4: modee=OUTPUT_MODE_RANDOM_SH;break;
+           //case 5: modee=OUTPUT_MODE_LFO;break;
+           //case 6: modee=OUTPUT_MODE_GATE;break;
+           //case 7: modee=OUTPUT_MODE_GATE;break;
+           //case 8: modee=OUTPUT_MODE_GATE;break;
+           //case 9: modee=OUTPUT_MODE_GATE;break;
+       }
+       setChannel(channel, modee, value);
+  }
+  /*Serial.print("RTPMIDI : cc :");
   Serial.print(channel);
   Serial.print(" ");
   Serial.print(controller);
   Serial.print(" ");
-  Serial.println(value);
+  Serial.println(value);*/
 }
 
 void rtpMidiNoteOn(byte channel, byte note, byte velocity) {

@@ -70,10 +70,6 @@ void oscOutMsg(OSCMessage & msg, int addrOffset) {
     addrOffset++;
   }
 
-  //if (debug) {
-  //  Serial.print("/out/");
-  //  Serial.print(index);
-  //}
   float value = 0;
   if (msg.isFloat(0)) {
     value = msg.getFloat(0);
@@ -84,21 +80,16 @@ void oscOutMsg(OSCMessage & msg, int addrOffset) {
   }
 
   if (msg.fullMatch("trig", addrOffset)) {
-    //if (debug) Serial.print("/trig ");
     if (value > 0) {
       setChannel(index, OUTPUT_MODE_TRIG, 1);
     }
   } else if (msg.fullMatch("gate", addrOffset)) {
-    //if (debug) Serial.print("/gate ");
-    setChannel(index, INPUT_MODE_GATE, value);
+    setChannel(index, OUTPUT_MODE_GATE, value);
   } else if (msg.fullMatch("cvuni", addrOffset) || msg.fullMatch("cv", addrOffset)) {
-    //if (debug)  Serial.print("/cvuni ");
-    setChannel(index, INPUT_MODE_CVUNI, value);
+    setChannel(index, OUTPUT_MODE_CVUNI, value);
   } else if (msg.fullMatch("cvbi", addrOffset)) {
-    //if (debug)  Serial.print("/cvbi ");
-    setChannel(index, INPUT_MODE_CVBI, value);
+    setChannel(index, OUTPUT_MODE_CVBI, value);
   }
-  //if (debug) Serial.println(value);
 }
 
 void oscInMsg(OSCMessage & msg, int addrOffset) {

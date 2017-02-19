@@ -1,7 +1,6 @@
 
 // https://github.com/esp8266/Arduino/tree/master/doc/esp8266wifi
 #include <ESP8266WiFi.h> // https://github.com/esp8266/Arduino
-
 #include <ESP8266WiFiMulti.h>
 #include <ESP8266mDNS.h>
 
@@ -9,7 +8,7 @@ ESP8266WiFiMulti WiFiMulti;
 
 
 void setupWifi() {
-  WiFi.hostname(myName);
+  
   if (!configuration.wifiAPMode) {
     //wifi client
     WiFiMulti.addAP(configuration.wifiSSID, configuration.wifiPassword);
@@ -61,8 +60,8 @@ void setupMDNS() {
   } else {
     Serial.println("mDNS responder started");
     MDNS.addService("http", "tcp", 80);
-    MDNS.addService("osc", "udp", 5000);
-    MDNS.addService("rtpmidi", "udp", 5004);
+    MDNS.addService("osc", "udp", 5000);//http://opensoundcontrol.org/files/Rendezvous-OSC.pdf "_osc._udp."
+    MDNS.addService("midi", "udp", 5004);
   }
 }
 
@@ -79,4 +78,5 @@ void setupUniqueName() {
   memset(myName, 0, n.length() + 1);
   for (int i = 0; i < n.length(); i++)
     myName[i] = n.charAt(i);
+   WiFi.hostname(myName);
 }

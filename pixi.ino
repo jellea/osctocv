@@ -5,19 +5,10 @@
 #define OUTPUT_TRIG_LOW 0
 #define OUTPUT_TRIG_HIGH 4096
 
-//length of the Trigs. will depend on pixi write timer.
-#define OUTPUT_TRIG_LENGTH 50
+
+#define OUTPUT_TRIG_LENGTH 15 //15ms. timer is for now every ms.
 
 Pixi pixi;
-
-// value for the pin [0-4096]
-//float pinValues[20] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
-//pin mode. see OUTPUT_ and INPUT_ constants
-//word pinModes[20] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-//LFO
-//word lfoModes[20] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-//word lfoPhases[20] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 //count to zero until zero to generate trig of N ms. see OUTPUT_TRIG_LENGTH
 word pinTrigCyles[20] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -48,7 +39,8 @@ void setChannel(int channel, int modee, float value) {
     int channelMode = modee < 100 ? CH_MODE_DAC : CH_MODE_ADC_P;
     configuration.pinModes[channel] = modee;
     pixi.configChannel(channel, channelMode, 0, range, 0);
-
+    //
+    configurationNeedsSave=true;
     if (debug) {
       Serial.print("Channel ");
       Serial.print(channel);
@@ -95,10 +87,10 @@ void setChannel(int channel, int modee, float value) {
       pinTrigCyles[channel] = OUTPUT_TRIG_LENGTH;
       break;
     case  OUTPUT_MODE_CVUNI:
-      configuration.pinValues[channel] = value < 0 ? 0 : value > 1 ? 4096 : value * 4096;
+      configuration.pinValues[channel] = value < 0 ? 0 : value > 1 ? 4096 : (int)(value * 4096);
       break;
     case  OUTPUT_MODE_CVBI:
-      configuration.pinValues[channel] = value < -1 ? 0 : value > 1 ? 4096 : value * 2048 + 2048;
+      configuration.pinValues[channel] = value < -1 ? 0 : value > 1 ? 4096 : (int)(value * 2048 + 2048);
       break;
   }
 
