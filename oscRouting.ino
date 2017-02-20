@@ -5,7 +5,9 @@
 #include <OSCData.h>
 WiFiUDP Udp;
 
-
+/**
+   setup osc server on configured port
+*/
 void setupOSCServer() {
   if (configuration.oscEnabled) {
     Udp.begin(configuration.oscPort);
@@ -15,6 +17,9 @@ void setupOSCServer() {
 }
 
 
+/**
+   handle osc messages on the wire
+*/
 void receiveOSCMessage() {
   if (configuration.oscEnabled) {
     OSCErrorCode error;
@@ -27,6 +32,7 @@ void receiveOSCMessage() {
       while (size--) {
         uint8_t i = Udp.read();
         //detect if this is a bundle or a single OSC message
+        //for some reason OSCBundle is not able to parse single messages
         if (first && i == '/') {
           isMessage = true;
         }
@@ -54,19 +60,22 @@ void receiveOSCMessage() {
   }
 }
 
+/**
+   "/out/" message handling
+*/
 void oscOutMsg(OSCMessage & msg, int addrOffset) {
 
-  //get index
-  int index = indexOfPin(msg, addrOffset);
-  if (index == -1) {
+  //get channel
+  int channel = getChannel(msg, addrOffset);
+  if (channel == -1) {
     return;
   }
 
-  //address offset for index
+  //address offset for channel
   addrOffset++;
   addrOffset++;
   addrOffset++;
-  if (index > 9) {
+  if (channel > 9) {
     addrOffset++;
   }
 
@@ -81,67 +90,90 @@ void oscOutMsg(OSCMessage & msg, int addrOffset) {
 
   if (msg.fullMatch("trig", addrOffset)) {
     if (value > 0) {
-      setChannel(index, OUTPUT_MODE_TRIG, 1);
+      setChannel(channel, OUTPUT_MODE_TRIG, 1);
     }
   } else if (msg.fullMatch("gate", addrOffset)) {
-    setChannel(index, OUTPUT_MODE_GATE, value);
+    setChannel(channel, OUTPUT_MODE_GATE, value);
   } else if (msg.fullMatch("cvuni", addrOffset) || msg.fullMatch("cv", addrOffset)) {
-    setChannel(index, OUTPUT_MODE_CVUNI, value);
+    setChannel(channel, OUTPUT_MODE_CVUNI, value);
   } else if (msg.fullMatch("cvbi", addrOffset)) {
-    setChannel(index, OUTPUT_MODE_CVBI, value);
+    setChannel(channel, OUTPUT_MODE_CVBI, value);
+  } else if (msg.fullMatch("flipflop", addrOffset)) {
+    setChannel(channel, OUTPUT_MODE_FLIPFLOP, value);
   }
 }
 
+
+/**
+   "/in" messages handling
+*/
 void oscInMsg(OSCMessage & msg, int addrOffset) {
-  //get index
-  int index = indexOfPin(msg, addrOffset);
-  if (index == -1) {
+  //get channel
+  int channel = getChannel(msg, addrOffset);
+  if (channel == -1) {
     return;
   }
 
-  //address offset for index
+  //address offset for channel
   addrOffset++;
   addrOffset++;
   addrOffset++;
-  if (index > 9) {
+  if (channel > 9) {
     addrOffset++;
   }
 
   float value = msg.getFloat(0);
   if (msg.match("trig", addrOffset)) {
-    setChannel(index, OUTPUT_MODE_TRIG, 1);
+    setChannel(channel, OUTPUT_MODE_TRIG, 1);
   } else if (msg.match("gate", addrOffset)) {
-    setChannel(index, INPUT_MODE_GATE, 0);
+    setChannel(channel, INPUT_MODE_GATE, 0);
   } else if (msg.match("cvuni", addrOffset)) {
-    setChannel(index, INPUT_MODE_CVUNI, 0);
+    setChannel(channel, INPUT_MODE_CVUNI, 0);
   } else if (msg.match("cvbi", addrOffset)) {
-    setChannel(index, INPUT_MODE_CVBI, 0);
+    setChannel(channel, INPUT_MODE_CVBI, 0);
+  } else if (msg.match("lfo/sine", addrOffset)) {
+    setChannel(channel, OUTPUT_MODE_LFO_SINE, 0);
+    configuration.channelLFOFrequencies[channel] = value;
+  } else if (msg.match("lfo/saw", addrOffset)) {
+    setChannel(channel, OUTPUT_MODE_LFO_SAW, 0);
+    configuration.channelLFOFrequencies[channel] = value;
+  } else if (msg.match("lfo/ramp", addrOffset)) {
+    setChannel(channel, OUTPUT_MODE_LFO_RAMP, 0);
+    configuration.channelLFOFrequencies[channel] = value;
+  } else if (msg.match("lfo/tri", addrOffset)) {
+    setChannel(channel, OUTPUT_MODE_LFO_TRI, 0);
+    configuration.channelLFOFrequencies[channel] = value;
+  } else if (msg.match("lfo/square", addrOffset)) {
+    setChannel(channel, OUTPUT_MODE_LFO_SQUARE, 0);
+    configuration.channelLFOFrequencies[channel] = value;    
   }
 }
 
-
-int indexOfPin(OSCMessage & msg, int addrOffset) {
-  int index = -1;
+/**
+   get channel from osc path at currect addrOffset
+*/
+int getChannel(OSCMessage & msg, int addrOffset) {
+  int channel = -1;
   for (int i = 0; i < 20; i++) {
     if (msg.match(numToOSCAddress(i), addrOffset) > 0) {
-      index = i;
+      channel = i;
       break;
     }
   }
-  return index;
+  return channel;
 }
 
 
 // borrowed from https://github.com/CNMAT/OSC/blob/master/examples/UDPReceive/UDPReceive.ino#L29
-char * numToOSCAddress(int pin) {
+char * numToOSCAddress(int channel) {
   static char s[10];
   int i = 9;
   s[i--] = '\0';
   do {
-    s[i] = "0123456789"[pin % 10];
+    s[i] = "0123456789"[channel % 10];
     --i;
-    pin /= 10;
-  } while (pin && i);
+    channel /= 10;
+  } while (channel && i);
   s[i] = '/';
   return &s[i];
 }
