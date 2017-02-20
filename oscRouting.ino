@@ -100,6 +100,21 @@ void oscOutMsg(OSCMessage & msg, int addrOffset) {
     setChannel(channel, OUTPUT_MODE_CVBI, value);
   } else if (msg.fullMatch("flipflop", addrOffset)) {
     setChannel(channel, OUTPUT_MODE_FLIPFLOP, value);
+  } else if (msg.match("lfo/sine", addrOffset)) {
+    setChannel(channel, OUTPUT_MODE_LFO_SINE, 0);
+    configuration.channelLFOFrequencies[channel] = value;
+  } else if (msg.match("lfo/saw", addrOffset)) {
+    setChannel(channel, OUTPUT_MODE_LFO_SAW, 0);
+    configuration.channelLFOFrequencies[channel] = value;
+  } else if (msg.match("lfo/ramp", addrOffset)) {
+    setChannel(channel, OUTPUT_MODE_LFO_RAMP, 0);
+    configuration.channelLFOFrequencies[channel] = value;
+  } else if (msg.match("lfo/tri", addrOffset)) {
+    setChannel(channel, OUTPUT_MODE_LFO_TRI, 0);
+    configuration.channelLFOFrequencies[channel] = value;
+  } else if (msg.match("lfo/square", addrOffset)) {
+    setChannel(channel, OUTPUT_MODE_LFO_SQUARE, 0);
+    configuration.channelLFOFrequencies[channel] = value;
   }
 }
 
@@ -131,21 +146,6 @@ void oscInMsg(OSCMessage & msg, int addrOffset) {
     setChannel(channel, INPUT_MODE_CVUNI, 0);
   } else if (msg.match("cvbi", addrOffset)) {
     setChannel(channel, INPUT_MODE_CVBI, 0);
-  } else if (msg.match("lfo/sine", addrOffset)) {
-    setChannel(channel, OUTPUT_MODE_LFO_SINE, 0);
-    configuration.channelLFOFrequencies[channel] = value;
-  } else if (msg.match("lfo/saw", addrOffset)) {
-    setChannel(channel, OUTPUT_MODE_LFO_SAW, 0);
-    configuration.channelLFOFrequencies[channel] = value;
-  } else if (msg.match("lfo/ramp", addrOffset)) {
-    setChannel(channel, OUTPUT_MODE_LFO_RAMP, 0);
-    configuration.channelLFOFrequencies[channel] = value;
-  } else if (msg.match("lfo/tri", addrOffset)) {
-    setChannel(channel, OUTPUT_MODE_LFO_TRI, 0);
-    configuration.channelLFOFrequencies[channel] = value;
-  } else if (msg.match("lfo/square", addrOffset)) {
-    setChannel(channel, OUTPUT_MODE_LFO_SQUARE, 0);
-    configuration.channelLFOFrequencies[channel] = value;    
   }
 }
 

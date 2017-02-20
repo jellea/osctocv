@@ -1,5 +1,7 @@
 /*
   TODO :
+  - general
+    - simpler mode mgmt
   - RTP MIDI
     - default mappings
     - web and readme help
@@ -10,8 +12,6 @@
   - pixi
     - LFOs
     - tempo synced lfo
-    - RANDOM S/H
-    - flip / flop
     - trigger / gate detection
     - cv in ->
   - OSC

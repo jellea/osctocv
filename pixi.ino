@@ -67,6 +67,9 @@ void setChannel(int channel, int modee, float value) {
           case OUTPUT_MODE_TRIG:
             Serial.println("OUTPUT_MODE_TRIG");
             break;
+          case OUTPUT_MODE_FLIPFLOP:
+            Serial.println("OUTPUT_MODE_FLIPFLOP");
+            break;
           case OUTPUT_MODE_CVUNI:
             Serial.println("OUTPUT_MODE_CVUNI");
             break;
@@ -100,14 +103,14 @@ void setChannel(int channel, int modee, float value) {
       case OUTPUT_MODE_TRIG:
         channelTrigCyles[channel] = OUTPUT_TRIG_LENGTH;
         break;
+      case OUTPUT_MODE_FLIPFLOP:
+        configuration.channelValues[channel] = configuration.channelValues[channel] > OUTPUT_TRIG_LOW ? OUTPUT_TRIG_HIGH : OUTPUT_TRIG_LOW;
+        break;
       case OUTPUT_MODE_CVUNI:
         configuration.channelValues[channel] = value < 0 ? 0 : value > 1 ? 4096 : (int)(value * 4096);
         break;
       case OUTPUT_MODE_CVBI:
         configuration.channelValues[channel] = value < -1 ? 0 : value > 1 ? 4096 : (int)(value * 2048 + 2048);
-        break;
-      case OUTPUT_MODE_FLIPFLOP:
-        configuration.channelValues[channel] = configuration.channelValues[channel] > OUTPUT_TRIG_LOW ? OUTPUT_TRIG_HIGH : OUTPUT_TRIG_LOW;
         break;
     }
 
@@ -121,6 +124,9 @@ void setChannel(int channel, int modee, float value) {
           break;
         case OUTPUT_MODE_TRIG:
           Serial.print("OUTPUT_MODE_TRIG");
+          break;
+        case OUTPUT_MODE_FLIPFLOP:
+          Serial.print("OUTPUT_MODE_FLIPFLOP");
           break;
         case OUTPUT_MODE_CVUNI:
           Serial.print("OUTPUT_MODE_CVUNI");
@@ -190,36 +196,31 @@ inline void updatePixi() {
             configuration.channelValues[i] = sin(lfoPhaseNow * 2 * PI) * 2048 + 2048;//TODO: use lookup table
             break;
           case OUTPUT_MODE_LFO_SAW:
-            configuration.channelValues[i] = (1- lfoPhaseNow) * 4096;
+            configuration.channelValues[i] = (1 - lfoPhaseNow) * 4096;
             break;
           case OUTPUT_MODE_LFO_RAMP:
             configuration.channelValues[i] = lfoPhaseNow * 4096;
             break;
           case OUTPUT_MODE_LFO_TRI:
-            configuration.channelValues[i] = (lfoPhaseNow > 0.5 ? lfoPhaseNow * 2 : 1 - lfoPhaseNow * 2) * 4096; //TODO: do me
+            configuration.channelValues[i] = (lfoPhaseNow < 0.5 ? lfoPhaseNow * 2 : (1 - lfoPhaseNow) * 2) * 2048 + 2048; //TODO: do me
             break;
           case OUTPUT_MODE_LFO_SQUARE:
             configuration.channelValues[i] = (lfoPhaseNow < configuration.channelLFOPWMs[i]) ? OUTPUT_TRIG_HIGH : OUTPUT_TRIG_LOW;
             break;
         }
-        if (i == 0 && ccc%57==0) {
-          //Serial.print("lfoPhaseNow:");
-          //Serial.println(lfoPhaseNow);
-          //Serial.print("period:");
-          //Serial.println(lfoPeriodInMs);
-          //Serial.print("mode:");
-          //Serial.println(configuration.channelModes[i]);
-          //Serial.print("value:");
-          //Serial.println(configuration.channelValues[i]);
-        }
       }
     }
+
 
     //actually write value to pixi
     if (configuration.channelModes[i] <  100) {
       pixi.WriteRegister(PIXI_DAC_DATA + i, configuration.channelValues[i]);
     }
   }
+  //if ( ccc % 57 == 0) {
+  //  Serial.print("value:");
+  //  Serial.println(configuration.channelValues[0]);
+  //}
 }
 
 
