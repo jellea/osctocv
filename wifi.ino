@@ -1,14 +1,14 @@
 
-// https://github.com/esp8266/Arduino/tree/master/doc/esp8266wifi
 #include <ESP8266WiFi.h> // https://github.com/esp8266/Arduino
 #include <ESP8266WiFiMulti.h>
 #include <ESP8266mDNS.h>
 
 ESP8266WiFiMulti WiFiMulti;
 
-
+/**
+ * general wifi setup
+ */
 void setupWifi() {
-
   if (!configuration.wifiAPMode) {
     //wifi client
     WiFiMulti.addAP(configuration.wifiSSID, configuration.wifiPassword);
@@ -17,8 +17,8 @@ void setupWifi() {
     int elapsed = 0;
     while (WiFiMulti.run() != WL_CONNECTED && elapsed < 5 * 1000) {
       Serial.print(".");
-      delay(t);
-      elapsed += t;
+      delay(500);
+      elapsed += 500;
     }
     if (WiFiMulti.run() != WL_CONNECTED) {
       Serial.print("\nFailed to connect to ");
@@ -37,6 +37,9 @@ void setupWifi() {
   }
 }
 
+/**
+ * setup pixi as soft access point
+ */
 void setupWifiAP() {
   Serial.print("Wifi in AP Mode SSID:");
   Serial.print(myName);
@@ -51,6 +54,10 @@ void setupWifiAP() {
   }
 }
 
+/**
+ * setup bonjour/zeroconfig/mdns for
+ * osc, web and rtp midi
+ */
 void setupMDNS() {
   if (!MDNS.begin(myName)) {
     Serial.println("Error setting up MDNS responder!");
@@ -58,16 +65,19 @@ void setupMDNS() {
     Serial.println("mDNS responder started");
     MDNS.addService("http", "tcp", 80);
     MDNS.addService("osc", "udp", 5000);
-    MDNS.addService("midi", "udp", 5004);
+    MDNS.addService("midi", "udp", 5004); //FIXME: apple protocol seems more complex.
   }
 }
 
-
+/**
+ * setup a unique name based on our name and mac address
+ */
 void setupUniqueName() {
   //unique name
   uint8_t mac[WL_MAC_ADDR_LENGTH];
   WiFi.softAPmacAddress(mac);
   String macID = String(mac[WL_MAC_ADDR_LENGTH - 2], HEX) + String(mac[WL_MAC_ADDR_LENGTH - 1], HEX);
+  //Serial.print(mac);
   macID.toLowerCase();
   String n = "oscpixi-" + macID;
   memset(myName, 0, n.length() + 1);

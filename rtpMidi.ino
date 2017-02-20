@@ -1,6 +1,7 @@
 #include "AppleMidi.h" //https://github.com/lathoub/Arduino-AppleMidi-Library
 
 bool rtpMidiIsConnected = false;
+
 APPLEMIDI_CREATE_INSTANCE(WiFiUDP, AppleMIDI); // see definition in AppleMidi_Defs.h
 
 void setupRtpMidi() {
@@ -18,7 +19,10 @@ void setupRtpMidi() {
   }
 }
 
-
+/**
+ * handle incoming messages 
+ * and protocol management tasks
+ */
 void rtpMidiLoop() {
   // Listen for incoming messages
   if (configuration.rtpMidiEnabled) {
