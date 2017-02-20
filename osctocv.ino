@@ -9,6 +9,7 @@
     - mdns discovery
   - pixi
     - LFOs
+    - tempo synced lfo
     - RANDOM S/H
     - flip / flop
     - trigger / gate detection
@@ -18,27 +19,25 @@
 */
 
 #include <pgmspace.h> //PROGMEM
-
 #include <OSCMessage.h> // dependency: https://github.com/CNMAT/OSC
 #include <Ticker.h>
-
-Ticker ticker;
-
 
 //
 #define OUTPUT_MODE_GATE 1
 #define OUTPUT_MODE_TRIG 2
 #define OUTPUT_MODE_CVUNI 3
 
-#define OUTPUT_MODE_RANDOM_SH 20
+#define OUTPUT_MODE_FLIPFLOP 10
+
+#define OUTPUT_MODE_RANDOM_SH 40
 
 #define OUTPUT_MODE_CVBI 50
 
-#define OUTPUT_MODE_LFO_SQUARE 51
-#define OUTPUT_MODE_LFO_SAW 52
-#define OUTPUT_MODE_LFO_RAMP 53
-#define OUTPUT_MODE_LFO_TRI 55
-#define OUTPUT_MODE_LFO_SINE 56
+#define OUTPUT_MODE_LFO_SINE 71
+#define OUTPUT_MODE_LFO_SAW 81
+#define OUTPUT_MODE_LFO_RAMP 82
+#define OUTPUT_MODE_LFO_TRI 83
+#define OUTPUT_MODE_LFO_SQUARE 91
 
 #define INPUT_MODE_GATE 100
 #define INPUT_MODE_TRIG 101
@@ -46,9 +45,15 @@ Ticker ticker;
 
 #define INPUT_MODE_CVBI 150
 
+//timer for updating pixi
+//todo look at faster timers ?
+Ticker ticker;
+
+// reset config in eeprom
+boolean resetConfig = false;
 
 //used to build a unique named based on mac
-char* myName = "oscpixi-XXXXXX";
+char* myName = "oscpixi-xxxx";
 
 //will enable some Serial.print
 bool debug = true;
@@ -101,11 +106,13 @@ void setupTimer() {
 
 
 void loop() {
+  //blink me please
   digitalWrite(LED_BUILTIN, (millis() / 100) % 2 ? HIGH : LOW);
+  //handle clients
   receiveOSCMessage();
   handleWebClient();
   rtpMidiLoop();
-  
+  //save configuration if needed
   saveConfiguration(false);
 }
 
