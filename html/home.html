@@ -1,0 +1,48 @@
+<html>
+<title>OSCPixi</title>
+<link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' crossorigin='anonymous'>
+<div class='container' style='width:450px;margin20px;padding:20px'>
+	
+	<nav class='navbar navbar-default'>
+		<div class='container-fluid'>
+			<div class='collapse navbar-collapse'>
+			  <ul class='nav navbar-nav'>
+			 	<li class='active'><a href='/'>OSCPixi</a><li>
+				<li><a href='/rest'>Rest API</a></li>
+				<li><a href='/wifi'>WLAN</a></li>
+				<li><a href='/status'>Status</a></li>
+			  </ul>
+			</div>
+		</div>
+	</nav>
+	
+	<h1>OSCPixi</h1>
+	<p>OSCPixi is. what it is.</p>
+	
+	<h2>OSC API</h2>
+	<p>port 5000<p>
+	<p>/out/&lt;1-20&gt;/&lt;&gt; float</p>
+	<p>output mode: trig, gate, cvuni, cvbi, lfosine, lfosaw, lforamp, lfotri, lfosquare</p>
+	<p>/in/&lt;1-20&gt;/&lt;mode&gt;</p>
+	<p>input mode: trig, gate, cvuni, cvbi</p>
+	
+	<h2>RTP MIDI</h2>
+	<p>todo</p>
+	
+	<h2>Rest Api</h2>
+	<p>/out/?channel=&lt;1-20&gt;&amp;mode=&lt;trig|gate|cvuni|cvbi&gt;&amp;value=float</p>
+	<p>/in/?channel&lt;1-20&gt;&amp;mode=&lt;trig|gate|cvuni|cvbi&gt;</p>
+	<p> see this web <a href='/rest'>form</a></p>
+	
+	<h2>Source</h2>
+	<p> 
+		source available on 
+		<a href='https://github.com/hdavid/osctocv'>https://github.com/hdavid/osctocv</a>
+	</p>
+	
+	<h2>Updates</h2>
+	<p> 
+		via usb. make sure to unplug the module from your modular power supply first !
+	</p>
+</div>
+<html>
