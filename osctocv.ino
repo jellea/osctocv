@@ -21,38 +21,24 @@
 #include <pgmspace.h> //PROGMEM
 #include <OSCMessage.h> // dependency: https://github.com/CNMAT/OSC
 #include <Ticker.h>
+#include <Pixi.h>  // dependency: https://github.com/wolfgangfriedrich/Pixi_demo
 
-//
-#define OUTPUT_MODE_GATE 1
-#define OUTPUT_MODE_TRIG 2
-#define OUTPUT_MODE_CVUNI 3
+/**
+    our pixi instance !
+*/
+Pixi pixi;
 
-#define OUTPUT_MODE_FLIPFLOP 10
 
-#define OUTPUT_MODE_RANDOM_SH 40
-
-#define OUTPUT_MODE_CVBI 50
-
-#define OUTPUT_MODE_LFO_SINE 71
-#define OUTPUT_MODE_LFO_SAW 81
-#define OUTPUT_MODE_LFO_RAMP 82
-#define OUTPUT_MODE_LFO_TRI 83
-#define OUTPUT_MODE_LFO_SQUARE 91
-
-#define INPUT_MODE_GATE 100
-#define INPUT_MODE_TRIG 101
-#define INPUT_MODE_CVUNI 102
-
-#define INPUT_MODE_CVBI 150
-
-//timer for updating pixi
-//todo look at faster timers ?
+/**
+ * timer for updating pixi
+ * todo look at faster timers ?
+ */
 Ticker ticker;
 
 // reset config in eeprom
 boolean resetConfig = false;
 
-//used to build a unique named based on mac
+//used to build a unique named based on mac address
 char* myName = "oscpixi-xxxx";
 
 //will enable some Serial.print

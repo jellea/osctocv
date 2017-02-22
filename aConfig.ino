@@ -9,16 +9,18 @@
 #define CONFIG_START 32
 
 /**
-   set to true if config has been changed and needs saving
+*  set to true if config has been changed and needs saving
 */
 boolean configurationNeedsSave = false;
 
 /**
-   records last configuration saving, in order to avoid over-frequent saving
+*  records last configuration saving, in order to avoid over-frequent saving
 */
 unsigned long configurationLastSave = 0;
 
-// Example settings structure
+/**
+ * configuration struc
+ */
 struct StoreStruct {
   char version[4]; // This is for mere detection if they are your settings
   boolean wifiAPMode;
@@ -30,7 +32,7 @@ struct StoreStruct {
   boolean restEnabled;
   boolean rtpMidiEnabled;
   int rtpMidiChannel;
-  int channelValues[20]; // channel values (0 to 4096)
+  int channelValues[20]; // channel values (0 to 4095)
   int channelModes[20]; // channel mode
   float channelLFOFrequencies[20]; // in Hz
   float channelLFOPhases[20];  // 0 to 1
@@ -40,7 +42,7 @@ struct StoreStruct {
   CONFIG_VERSION,
   // The default values
   false, // wifi ap mode
-  "redpill", // client mode ssid
+  "ssid", // client mode ssid
   "0101010101", // client mode password
   "0101010101", // ap mode password
   true, // osc enabled
@@ -55,6 +57,10 @@ struct StoreStruct {
   {0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f}, //lfo pwm
 };
 
+
+/**
+ * load configuration from eeprom.
+ */
 void loadConfiguration() {
   EEPROM.begin(1024);
   // To make sure there are settings, and they are YOURS!
@@ -81,6 +87,10 @@ void loadConfiguration() {
   }
 }
 
+
+/**
+ * save config in eeprom
+ */
 void saveConfiguration(boolean force) {
   noInterrupts();
   //when to save config ?
@@ -95,14 +105,6 @@ void saveConfiguration(boolean force) {
     }
   }
   interrupts();
-}
-
-void printConfiguration() {
-  for (unsigned int t = 0; t < sizeof(configuration); t++) {
-    Serial.print(t);
-    Serial.print("\t");
-    Serial.println( *((char*)&configuration + t));
-  }
 }
 
 

@@ -1,9 +1,11 @@
 
 #include <WiFiUdp.h>
-
 #include <OSCBundle.h>
 #include <OSCData.h>
+
+
 WiFiUDP Udp;
+
 
 /**
    setup osc server on configured port
@@ -43,6 +45,7 @@ void receiveOSCMessage() {
           bundle.fill(i);
         }
       }
+
       if (isMessage) {
         message.route("/out", oscOutMsg);
         message.route("/in", oscInMsg);
@@ -56,9 +59,11 @@ void receiveOSCMessage() {
           Serial.println(error);
         }
       }
+
     }
   }
 }
+
 
 /**
    "/out/" message handling
@@ -88,33 +93,24 @@ void oscOutMsg(OSCMessage & msg, int addrOffset) {
     value = msg.getInt(0);
   }
 
-  if (msg.fullMatch("trig", addrOffset)) {
-    if (value > 0) {
-      setChannel(channel, OUTPUT_MODE_TRIG, 1);
-    }
-  } else if (msg.fullMatch("gate", addrOffset)) {
-    setChannel(channel, OUTPUT_MODE_GATE, value);
+  if (msg.fullMatch("gate", addrOffset)) {
+    channelSetModeAndValue(channel - 1, channelParseOutputMode("trig"), value);
   } else if (msg.fullMatch("cvuni", addrOffset) || msg.fullMatch("cv", addrOffset)) {
-    setChannel(channel, OUTPUT_MODE_CVUNI, value);
-  } else if (msg.fullMatch("cvbi", addrOffset)) {
-    setChannel(channel, OUTPUT_MODE_CVBI, value);
+    channelSetModeAndValue(channel - 1, channelParseOutputMode("cvuni"), value);
+  } else if (msg.fullMatch("cvbi" - 1, addrOffset)) {
+    channelSetModeAndValue(channel - 1, channelParseOutputMode("cvbi"), value);
   } else if (msg.fullMatch("flipflop", addrOffset)) {
-    setChannel(channel, OUTPUT_MODE_FLIPFLOP, value);
-  } else if (msg.match("lfo/sine", addrOffset)) {
-    setChannel(channel, OUTPUT_MODE_LFO_SINE, 0);
-    configuration.channelLFOFrequencies[channel] = value;
-  } else if (msg.match("lfo/saw", addrOffset)) {
-    setChannel(channel, OUTPUT_MODE_LFO_SAW, 0);
-    configuration.channelLFOFrequencies[channel] = value;
-  } else if (msg.match("lfo/ramp", addrOffset)) {
-    setChannel(channel, OUTPUT_MODE_LFO_RAMP, 0);
-    configuration.channelLFOFrequencies[channel] = value;
-  } else if (msg.match("lfo/tri", addrOffset)) {
-    setChannel(channel, OUTPUT_MODE_LFO_TRI, 0);
-    configuration.channelLFOFrequencies[channel] = value;
-  } else if (msg.match("lfo/square", addrOffset)) {
-    setChannel(channel, OUTPUT_MODE_LFO_SQUARE, 0);
-    configuration.channelLFOFrequencies[channel] = value;
+    channelSetModeAndValue(channel - 1, channelParseOutputMode("flipflop"), value);
+  } else if (msg.match("lfosine", addrOffset)) {
+    channelSetModeAndValue(channel - 1, channelParseOutputMode("lfosine"), value);
+  } else if (msg.match("lfosaw", addrOffset)) {
+    channelSetModeAndValue(channel - 1, channelParseOutputMode("lfosaw"), value);
+  } else if (msg.match("lforamp", addrOffset)) {
+    channelSetModeAndValue(channel - 1, channelParseOutputMode("lforamp"), value);
+  } else if (msg.match("lfotri", addrOffset)) {
+    channelSetModeAndValue(channel - 1, channelParseOutputMode("lfotri"), value);
+  } else if (msg.match("lfosquare", addrOffset)) {
+    channelSetModeAndValue(channel - 1, channelParseOutputMode("lfosquare"), value);
   }
 }
 
@@ -139,13 +135,13 @@ void oscInMsg(OSCMessage & msg, int addrOffset) {
 
   float value = msg.getFloat(0);
   if (msg.match("trig", addrOffset)) {
-    setChannel(channel, OUTPUT_MODE_TRIG, 1);
+    channelSetModeAndValue(channel - 1, channelParseInputMode("trig"), 1);
   } else if (msg.match("gate", addrOffset)) {
-    setChannel(channel, INPUT_MODE_GATE, 0);
+    channelSetModeAndValue(channel - 1, channelParseInputMode("gate"), 0);
   } else if (msg.match("cvuni", addrOffset)) {
-    setChannel(channel, INPUT_MODE_CVUNI, 0);
+    channelSetModeAndValue(channel - 1, channelParseInputMode("cbuni"), 0);
   } else if (msg.match("cvbi", addrOffset)) {
-    setChannel(channel, INPUT_MODE_CVBI, 0);
+    channelSetModeAndValue(channel - 1, channelParseInputMode("cvbi"), 0);
   }
 }
 

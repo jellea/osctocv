@@ -3,7 +3,9 @@
 #include <ESP8266WiFiMulti.h>
 #include <ESP8266mDNS.h>
 
+
 ESP8266WiFiMulti WiFiMulti;
+
 
 /**
  * general wifi setup
@@ -37,6 +39,7 @@ void setupWifi() {
   }
 }
 
+
 /**
  * setup pixi as soft access point
  */
@@ -54,6 +57,7 @@ void setupWifiAP() {
   }
 }
 
+
 /**
  * setup bonjour/zeroconfig/mdns for
  * osc, web and rtp midi
@@ -68,6 +72,7 @@ void setupMDNS() {
     MDNS.addService("midi", "udp", 5004); //FIXME: apple protocol seems more complex.
   }
 }
+
 
 /**
  * setup a unique name based on our name and mac address
@@ -86,3 +91,4 @@ void setupUniqueName() {
   myName[n.length()-1] = 0;
   WiFi.hostname(myName);
 }
+

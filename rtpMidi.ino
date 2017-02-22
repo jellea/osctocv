@@ -4,6 +4,7 @@ bool rtpMidiIsConnected = false;
 
 APPLEMIDI_CREATE_INSTANCE(WiFiUDP, AppleMIDI); // see definition in AppleMidi_Defs.h
 
+
 void setupRtpMidi() {
   if (configuration.rtpMidiEnabled) {
     Serial.println("RTPMidi on port 5004");
@@ -18,6 +19,7 @@ void setupRtpMidi() {
     AppleMIDI.OnReceiveControlChange(rtpMidiOnControlChange);
   }
 }
+
 
 /**
  * handle incoming messages 
@@ -35,6 +37,7 @@ void rtpMidiConnected(uint32_t ssrc, char* name) {
   rtpMidiIsConnected  = true;
 }
 
+
 void rtpMidiDisconnected(uint32_t ssrc) {
   rtpMidiIsConnected  = false;
 }
@@ -49,6 +52,7 @@ void rtpMidiOnNoteOn(byte channel, byte note, byte velocity) {
   Serial.println(velocity);
 }
 
+
 void rtpMidiOnNoteOff(byte channel, byte note, byte velocity) {
   Serial.print("RTPMIDI : note off :");
   Serial.print(channel);
@@ -57,7 +61,6 @@ void rtpMidiOnNoteOff(byte channel, byte note, byte velocity) {
   Serial.print(" ");
   Serial.println(velocity);
 }
-
 
 
 void rtpMidiOnControlChange(byte midiChannel, byte controller, byte midiValue) {
@@ -72,13 +75,13 @@ void rtpMidiOnControlChange(byte midiChannel, byte controller, byte midiValue) {
            case 2: modee=OUTPUT_MODE_CVUNI;break;
            case 3: modee=OUTPUT_MODE_CVBI;break;
            case 4: modee=OUTPUT_MODE_RANDOM_SH;break;
-           //case 5: modee=OUTPUT_MODE_LFO;break;
-           //case 6: modee=OUTPUT_MODE_GATE;break;
-           //case 7: modee=OUTPUT_MODE_GATE;break;
-           //case 8: modee=OUTPUT_MODE_GATE;break;
-           //case 9: modee=OUTPUT_MODE_GATE;break;
+           case 5: modee=OUTPUT_MODE_LFO_SINE;break;
+           case 6: modee=OUTPUT_MODE_LFO_SAW;break;
+           case 7: modee=OUTPUT_MODE_LFO_RAMP;break;
+           case 8: modee=OUTPUT_MODE_LFO_TRI;break;
+           case 9: modee=OUTPUT_MODE_LFO_SQUARE;break;
        }
-       setChannel(channel, modee, value);
+       channelSetModeAndValue(channel, modee, value);
   }
   /*Serial.print("RTPMIDI : cc :");
   Serial.print(channel);
@@ -88,13 +91,16 @@ void rtpMidiOnControlChange(byte midiChannel, byte controller, byte midiValue) {
   Serial.println(value);*/
 }
 
+
 void rtpMidiNoteOn(byte channel, byte note, byte velocity) {
   AppleMIDI.noteOn(note, velocity, channel);
 }
 
+
 void rtpMidiNoteOff(byte channel, byte note, byte velocity) {
   AppleMIDI.noteOff(note, velocity, channel);
 }
+
 
 void rtpMidiControlChange(byte channel, byte cc, byte value) {
   AppleMIDI.controlChange(cc, value, channel);
