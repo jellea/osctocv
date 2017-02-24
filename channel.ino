@@ -1,3 +1,4 @@
+
 //modes
 
 #define OUTPUT_MODE_GATE 1
@@ -29,13 +30,15 @@
 
 
 /**
-   count to zero until zero to generate trig of N ms. see OUTPUT_TRIG_LENGTH
+*   count to zero until zero to generate trig of N ms. see OUTPUT_TRIG_LENGTH
 */
 word channelTrigCyles[20] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
+word channelADC[20] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
 
 inline bool channelIsInput(int channel) {
-  return  configuration.channelModes[channel] > 100;
+  return  configuration.channelModes[channel] >= 100;
 }
 
 
@@ -60,6 +63,14 @@ inline float channelGetVoltageValue(int channel) {
     return configuration.channelValues[channel] / 4095.0 * 10.0 - 5;
   } else {
     return configuration.channelValues[channel] / 4095.0 * 10.0;
+  }
+}
+
+inline float channelGetADCVoltageValue(int channel) {
+  if (channelIsBipolar(channel)) {
+    return channelADC[channel] / 4095.0 * 10.0 - 5;
+  } else {
+    return channelADC[channel] / 4095.0 * 10.0;
   }
 }
 
@@ -103,6 +114,69 @@ inline void channelProcess(int channel, unsigned long now) {
   }
 }
 
+
+
+void channelSetModeAndValue(int channel, int channelMode, float value) {
+  if (channel >= 0 && channel < 20) {
+    //set channel mode if needed
+    if (channelMode != configuration.channelModes[channel]) {
+      configuration.channelModes[channel] = channelMode;
+      pixi.configChannel(channel, channelIsInput(channel) ? CH_MODE_ADC_P : CH_MODE_DAC_ADC_MON, 0, channelIsBipolar(channel) ? CH_5N_TO_5P : CH_0_TO_10P, 0); //CH_MODE_DAC_ADC_MON  CH_MODE_DAC
+      configurationNeedsSave = true;
+      if (debug) {
+        Serial.print("Channel ");
+        Serial.print(" configured : ");
+        if (channelIsInput(channel)) {
+          Serial.print("/in/");
+        } else {
+          Serial.print("/out/");
+        }
+        Serial.print(channel + 1);
+        Serial.print("/");
+        Serial.println(channelGetModeName(channel));
+      }
+    }
+
+    if (channelIsLfo(channel) && value > 0 && value < 1000 ) {
+      //set LFO speed
+      configuration.channelLFOFrequencies[channel] = value;
+    } else {
+      //update pixi value based on mode
+       switch (channelMode) {
+        case OUTPUT_MODE_GATE:
+          configuration.channelValues[channel] = value > 0.5 ? OUTPUT_TRIG_HIGH : OUTPUT_TRIG_LOW;
+          break;
+        case OUTPUT_MODE_TRIG:
+          channelTrigCyles[channel] = OUTPUT_TRIG_LENGTH;
+          break;
+        case OUTPUT_MODE_FLIPFLOP:
+          configuration.channelValues[channel] = configuration.channelValues[channel] > OUTPUT_TRIG_LOW ? OUTPUT_TRIG_LOW :OUTPUT_TRIG_HIGH;
+          break;
+        case OUTPUT_MODE_CVUNI:
+          configuration.channelValues[channel] = value < 0 ? 0 : value > 1 ? 4095 : (int)(value * 4095);
+          break;
+        case OUTPUT_MODE_CVBI:
+          configuration.channelValues[channel] = value < -1 ? 0 : value > 1 ? 4095 : (int)(value * 2048 + 2047);
+          break;
+      }
+    }
+
+    if (debug) {
+      if (channelIsInput(channel)) {
+        Serial.print("/in/");
+      } else {
+        Serial.print("/out/");
+      }
+      Serial.print(channel + 1);
+      Serial.print("/");
+      Serial.print(channelGetModeName(channel));
+      Serial.print(" ");
+      Serial.print(value);
+      Serial.print(" -> ");
+      Serial.println(configuration.channelValues[channel]);
+    }
+  }
+}
 
 
 inline int channelParseInputMode(String modee) {
@@ -204,56 +278,3 @@ String channelGetModeName(int channel) {
 }
 
 
-void channelSetModeAndValue(int channel, int channelMode, float value) {
-  if (channel >= 0 && channel < 20) {
-
-    //set channel mode if needed
-    if (channelMode != configuration.channelModes[channel]) {
-      configuration.channelModes[channel] = channelMode;
-      pixi.configChannel(channel, channelMode, 0, channelIsBipolar(channel) ? CH_5N_TO_5P : CH_0_TO_10P, 0);
-      configurationNeedsSave = true;
-      if (debug) {
-        Serial.print("Channel ");
-        Serial.print(channel + 1);
-        Serial.print(" configured as ");
-        Serial.print(channelGetModeName(channel));
-      }
-    }
-
-    if (channelIsLfo(channel) && value > 0 && value < 1000 ) {
-      //set LFO speed
-      configuration.channelLFOFrequencies[channel] = value;
-      
-    } else {
-      //update pixi value based on mode
-      switch (channelMode) {
-        case OUTPUT_MODE_GATE:
-          configuration.channelValues[channel] = value > 0.5 ? OUTPUT_TRIG_HIGH : OUTPUT_TRIG_LOW;
-          break;
-        case OUTPUT_MODE_TRIG:
-          channelTrigCyles[channel] = OUTPUT_TRIG_LENGTH;
-          break;
-        case OUTPUT_MODE_FLIPFLOP:
-          configuration.channelValues[channel] = configuration.channelValues[channel] > OUTPUT_TRIG_LOW ? OUTPUT_TRIG_HIGH : OUTPUT_TRIG_LOW;
-          break;
-        case OUTPUT_MODE_CVUNI:
-          configuration.channelValues[channel] = value < 0 ? 0 : value > 1 ? 4095 : (int)(value * 4095);
-          break;
-        case OUTPUT_MODE_CVBI:
-          configuration.channelValues[channel] = value < -1 ? 0 : value > 1 ? 4095 : (int)(value * 2048 + 2047);
-          break;
-      }
-    }
-
-    if (debug) {
-      Serial.print("/");
-      Serial.print(channel + 1);
-      Serial.print("/");
-      Serial.print(channelGetModeName(channel));
-      Serial.print(" ");
-      Serial.print(value);
-      Serial.print(" -> ");
-      Serial.println(configuration.channelValues[channel]);
-    }
-  }
-}

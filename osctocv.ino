@@ -2,6 +2,10 @@
   TODO :
   - general
     - simpler mode mgmt
+    - config not saving bug ??
+    - dac not working
+    - adc ?
+    
   - RTP MIDI
     - default mappings
     - web and readme help
@@ -63,7 +67,7 @@ void setup() {
   loadConfiguration();
 
   setupWifi();
-  //delay(500);
+  delay(500);
   setupMDNS();
   setupPixi();
   createWebServerRoutes();

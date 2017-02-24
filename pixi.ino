@@ -34,9 +34,11 @@ inline void updatePixi() {
     //generate trigs, lfo, sh etc.
     channelProcess(channel, now);
     //actually write value to pixi
+    pixi.writeAnalog(channel, configuration.channelValues[channel]);
     if (!channelIsInput(channel)) {
-      pixi.WriteRegister(PIXI_DAC_DATA + channel, configuration.channelValues[channel]);
+      //pixi.WriteRegister(PIXI_DAC_DATA + channel, configuration.channelValues[channel]);
     }
+    channelADC[channel] = pixi.ReadRegister(PIXI_ADC_DATA + channel, true);
   }
 }
 
