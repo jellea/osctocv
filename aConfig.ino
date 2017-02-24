@@ -97,6 +97,7 @@ void saveConfiguration(boolean force) {
   if (configurationNeedsSave || force) {
     if (millis() - configurationLastSave > 1000 * 60 || force) {
       configurationLastSave = millis();
+      configurationNeedsSave = false;
       for (unsigned int t = 0; t < sizeof(configuration); t++) {
         EEPROM.write(CONFIG_START + t, *((char*)&configuration + t));
       }
