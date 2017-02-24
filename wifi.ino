@@ -8,7 +8,7 @@ ESP8266WiFiMulti WiFiMulti;
 
 
 /**
- * general wifi setup
+ *  general wifi setup
  */
 void setupWifi() {
   if (!configuration.wifiAPMode) {
@@ -41,19 +41,19 @@ void setupWifi() {
 
 
 /**
- * setup pixi as soft access point
+ *  setup pixi as soft access point
  */
 void setupWifiAP() {
-  Serial.print("Wifi in AP Mode SSID:");
+  Serial.print("Wifi in AP Mode. SSID:");
   Serial.print(myName);
-  Serial.print(" password:");
-  Serial.print(configuration.wifiAPPassword);
   boolean result = WiFi.softAP(myName, configuration.wifiAPPassword);
   if (result == true) {
+    Serial.print(" password:");
+    Serial.print(configuration.wifiAPPassword);
     Serial.print(" IP address: ");
-    Serial.println(WiFi.softAPIP() );
+    Serial.println(WiFi.softAPIP());
   } else {
-    Serial.println(": Failed!");
+    Serial.println(" Failed!");
   }
 }
 
@@ -86,9 +86,10 @@ void setupUniqueName() {
   macID.toLowerCase();
   String n = "oscpixi-" + macID;
   memset(myName, 0, n.length() + 1);
-  for (int i = 0; i < n.length()-1; i++)
+  for (int i = 0; i < n.length() - 1; i++) {
     myName[i] = n.charAt(i);
-  myName[n.length()-1] = 0;
+  }
+  myName[n.length() - 1] = 0;
   WiFi.hostname(myName);
 }
 

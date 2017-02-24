@@ -4,12 +4,19 @@ bool rtpMidiIsConnected = false;
 
 APPLEMIDI_CREATE_INSTANCE(WiFiUDP, AppleMIDI); // see definition in AppleMidi_Defs.h
 
-
+/**
+ * setup RTP midi
+ */
 void setupRtpMidi() {
   if (configuration.rtpMidiEnabled) {
     Serial.println("RTPMidi on port 5004");
 
     AppleMIDI.begin(myName);
+
+    //Serial.print("AppleMIDI Session ");
+    //Serial.print(AppleMIDI.getSessionName());
+    //Serial.print(" with SSRC 0x");
+    //Serial.println(AppleMIDI.getSynchronizationSource(), HEX);
 
     AppleMIDI.OnConnected(rtpMidiConnected);
     AppleMIDI.OnDisconnected(rtpMidiDisconnected);
@@ -22,7 +29,7 @@ void setupRtpMidi() {
 
 
 /**
- * handle incoming messages 
+ * handle incoming messages
  * and protocol management tasks
  */
 void rtpMidiLoop() {
@@ -33,13 +40,29 @@ void rtpMidiLoop() {
 }
 
 
-void rtpMidiConnected(uint32_t ssrc, char* name) {
-  rtpMidiIsConnected  = true;
-}
-
-
-void rtpMidiDisconnected(uint32_t ssrc) {
-  rtpMidiIsConnected  = false;
+/**
+ * receive MIDI CC and map them to our outputs
+ */
+void rtpMidiOnControlChange(byte midiChannel, byte controller, byte midiValue) {
+  if (midiChannel == configuration.rtpMidiChannel || midiChannel == configuration.rtpMidiChannel + 1) {
+    int modeIndex = controller % 10;
+    int channel = controller / 10 + (midiChannel == configuration.rtpMidiChannel + 1) ? 10 : 0;
+    float value = midiValue / 127.0;
+    int modee = 0;
+    switch (modeIndex) {
+      case 0: modee = OUTPUT_MODE_GATE; break;
+      case 1: modee = OUTPUT_MODE_TRIG; break;
+      case 2: modee = OUTPUT_MODE_CVUNI; break;
+      case 3: modee = OUTPUT_MODE_CVBI; break;
+      case 4: modee = OUTPUT_MODE_RANDOM_SH; break;
+      case 5: modee = OUTPUT_MODE_LFO_SINE; break;
+      case 6: modee = OUTPUT_MODE_LFO_SAW; break;
+      case 7: modee = OUTPUT_MODE_LFO_RAMP; break;
+      case 8: modee = OUTPUT_MODE_LFO_TRI; break;
+      case 9: modee = OUTPUT_MODE_LFO_SQUARE; break;
+    }
+    channelSetModeAndValue(channel, modee, value);
+  }
 }
 
 
@@ -63,35 +86,6 @@ void rtpMidiOnNoteOff(byte channel, byte note, byte velocity) {
 }
 
 
-void rtpMidiOnControlChange(byte midiChannel, byte controller, byte midiValue) {
-  if (midiChannel == configuration.rtpMidiChannel || midiChannel == configuration.rtpMidiChannel + 1){
-      int modeIndex = controller%10;
-      int channel = controller/10 + (midiChannel == configuration.rtpMidiChannel + 1)?10:0;
-      float value = midiValue/127.0;
-      int modee = 0;
-      switch(modeIndex){
-           case 0: modee=OUTPUT_MODE_GATE;break;
-           case 1: modee=OUTPUT_MODE_TRIG;break;
-           case 2: modee=OUTPUT_MODE_CVUNI;break;
-           case 3: modee=OUTPUT_MODE_CVBI;break;
-           case 4: modee=OUTPUT_MODE_RANDOM_SH;break;
-           case 5: modee=OUTPUT_MODE_LFO_SINE;break;
-           case 6: modee=OUTPUT_MODE_LFO_SAW;break;
-           case 7: modee=OUTPUT_MODE_LFO_RAMP;break;
-           case 8: modee=OUTPUT_MODE_LFO_TRI;break;
-           case 9: modee=OUTPUT_MODE_LFO_SQUARE;break;
-       }
-       channelSetModeAndValue(channel, modee, value);
-  }
-  /*Serial.print("RTPMIDI : cc :");
-  Serial.print(channel);
-  Serial.print(" ");
-  Serial.print(controller);
-  Serial.print(" ");
-  Serial.println(value);*/
-}
-
-
 void rtpMidiNoteOn(byte channel, byte note, byte velocity) {
   AppleMIDI.noteOn(note, velocity, channel);
 }
@@ -99,6 +93,16 @@ void rtpMidiNoteOn(byte channel, byte note, byte velocity) {
 
 void rtpMidiNoteOff(byte channel, byte note, byte velocity) {
   AppleMIDI.noteOff(note, velocity, channel);
+}
+
+
+void rtpMidiConnected(uint32_t ssrc, char* name) {
+  rtpMidiIsConnected  = true;
+}
+
+
+void rtpMidiDisconnected(uint32_t ssrc) {
+  rtpMidiIsConnected  = false;
 }
 
 
