@@ -31,13 +31,13 @@
 #define OUTPUT_TRIG_LENGTH 15 //15ms. timer is for now every ms.
 
 /**
- * count to zero until zero to generate trig of N ms. see OUTPUT_TRIG_LENGTH
- */
+   count to zero until zero to generate trig of N ms. see OUTPUT_TRIG_LENGTH
+*/
 word channelTrigCyles[20] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 /**
- * holds ADC register values
- */
+   holds ADC register values
+*/
 word channelADC[20] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 
@@ -81,8 +81,8 @@ inline float channelGetADCVoltageValue(int channel) {
 
 
 /**
- * generate DAC output values based on channel modes
- */
+   generate DAC output values based on channel modes
+*/
 inline void channelProcess(int channel, unsigned long now) {
 
   //trigger mode
@@ -129,33 +129,35 @@ inline void channelSetModeAndValue(int channel, int channelMode, float value) {
 
 
 /**
- * set channel mode and value, force to force during boot sequence.
- */
+   set channel mode and value, force to force during boot sequence.
+*/
 void channelSetModeAndValue(int channel, int channelMode, float value, boolean force) {
   if (channel >= 0 && channel < 20) {
 
     //set channel mode if needed
     if (channelMode != configuration.channelModes[channel] || force) {
-      //save config before we forget
-      configuration.channelModes[channel] = channelMode;
       //config needs saving.
-      configurationNeedsSave = true;
-      
+      if (channelMode != configuration.channelModes[channel]) {
+        //save config before we forget
+        configuration.channelModes[channel] = channelMode;
+        configurationNeedsSave = true;
+      }
+
       //build channel configuration
       //MAX3100 pdf page 43
-      word channelMode = channelIsInput(channel) ? CH_MODE_ADC_P : CH_MODE_DAC_ADC_MON; //CH_MODE_DAC_ADC_MON  CH_MODE_DAC
+      word channelMode = channelIsInput(channel) ? CH_MODE_ADC_P : CH_MODE_DAC_ADC_MON; //CH_MODE_DAC  CH_MODE_DAC_ADC_MON
       word range = channelIsBipolar(channel) ? CH_5N_TO_5P : CH_0_TO_10P;
       pixi.WriteRegister(PIXI_PORT_CONFIG + channel,
                     (
                       ( (channelMode << 12 ) & FUNCID )
                       | ( (configuration.adcVoltageReference << 11) & FUNCPRM_AVR_INV) // adcVoltageReference 0 internal, 1 external
                       | ( (range << 8 ) & FUNCPRM_RANGE )
-                      | ( (configuration.nbAvgADCSamples << 4)& FUNCPRM_NR_OF_SAMPLES) // number of adc samples. in power of two.
+                      | ( (configuration.nbAvgADCSamples << 4) & FUNCPRM_NR_OF_SAMPLES) // number of adc samples. in power of two.
                     )
                    );
-      //old way.             
-      //pixi.configChannel(channel, channelMode, configuration.channelValues[channel], range , adc_ctl);
-      
+      //old way.
+      //pixi.configChannel(channel, channelMode, configuration.channelValues[channel], range , 0);
+
       if (configuration.debug) {
         Serial.print("Channel ");
         Serial.print(" configured : ");

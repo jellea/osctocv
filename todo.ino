@@ -2,12 +2,9 @@
   TODO :
   - general
     - config not saving bug ??
-    - dac
-      - dac not working
-      - monitoring
     - adc reading ?
     - fix unique name generation
-    
+
   - RTP MIDI
     - web and readme help
     - 14 bits midi cc support
@@ -20,5 +17,5 @@
     - cv in ->
   - OSC
     - sending message to remote host
-      - throttling 
+      - throttling
 */

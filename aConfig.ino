@@ -3,7 +3,7 @@
 #include <EEPROM.h>
 
 // ID of the settings block
-#define CONFIG_VERSION "cf1"
+#define CONFIG_VERSION "cf3"
 
 // where store configuration data in EEPROM
 #define CONFIG_START 32
@@ -42,9 +42,9 @@ struct StoreStruct {
   float channelLFOPWMs[20]; // 0 to 1
 } configuration = {
   CONFIG_VERSION,
-  false,  // debug mode
+  true,  // debug mode
   false,  // wifi ap mode
-  "ssid", // client mode ssid
+  "redpill", // client mode ssid
   "0101010101", // client mode password
   "0101010101", // ap mode password
   true, // osc enabled
@@ -52,10 +52,10 @@ struct StoreStruct {
   true, // rest
   true, // rtpMidiEnabled
   1,    // rtpMidiChannel
-  0,    // adcVoltageReference 0 internal, 1 external
-  1,    // number of adc samples. in power of two.
+  0x0b,    // adcVoltageReference 0 internal, 1 external
+  0x1b,    // number of adc samples. in power of two.
   {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // channel values
-  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // channel modes
+  {3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3}, // channel modes
   {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f},// LFO frequency
   {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}, // LFO phases (interesting to save to keep the relative phases)
   {0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f}, // LFO pwm

@@ -5,8 +5,8 @@ bool rtpMidiIsConnected = false;
 APPLEMIDI_CREATE_INSTANCE(WiFiUDP, AppleMIDI); // see definition in AppleMidi_Defs.h
 
 /**
- * setup RTP midi
- */
+   setup RTP midi
+*/
 void setupRtpMidi() {
   if (configuration.rtpMidiEnabled) {
     Serial.println("RTPMidi on port 5004");
@@ -29,9 +29,9 @@ void setupRtpMidi() {
 
 
 /**
- * handle incoming messages
- * and protocol management tasks
- */
+   handle incoming messages
+   and protocol management tasks
+*/
 void rtpMidiLoop() {
   // Listen for incoming messages
   if (configuration.rtpMidiEnabled) {
@@ -41,8 +41,8 @@ void rtpMidiLoop() {
 
 
 /**
- * receive MIDI CC and map them to our outputs
- */
+   receive MIDI CC and map them to our outputs
+*/
 void rtpMidiOnControlChange(byte midiChannel, byte controller, byte midiValue) {
   if (midiChannel == configuration.rtpMidiChannel || midiChannel == configuration.rtpMidiChannel + 1) {
     int modeIndex = controller % 10;

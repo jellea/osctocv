@@ -20,8 +20,8 @@ const char indexError[] PROGMEM = "index must be between 1 and 20";
 const char okReboot[] PROGMEM = "ok. power cycle your device.";
 
 /**
- * handle web traffic
- */
+   handle web traffic
+*/
 void handleWebClient() {
   if (configuration.restEnabled) {
     webServer.handleClient();
@@ -30,8 +30,8 @@ void handleWebClient() {
 
 
 /**
- * start our web server
- */
+   start our web server
+*/
 void startWebServer() {
   if (configuration.restEnabled) {
     Serial.println("Rest API on port 80");
@@ -41,30 +41,30 @@ void startWebServer() {
 
 
 /**
- * create routes that our webserver must use.
- */
+   create routes that our webserver must use.
+*/
 void createWebServerRoutes() {
 
   if (configuration.restEnabled) {
 
     webServer.onNotFound(webServerSendHome);
-    
+
     webServer.on("/", []() {
       webServer.send_P(200, textHMTL, homeHTML);
     });
-    
+
     webServer.on("/rest", []() {
       webServer.send_P(200, textHMTL, restHTML);
     });
-    
+
     webServer.on("/wifi", []() {
       webServer.send_P(200, textHMTL, wifiHTML);
     });
-    
+
     webServer.on("/status", []() {
       webServer.send_P(200, textHMTL, statusHTML);
     });
-    
+
     webServer.on("/blank", []() {
       webServer.send_P(200, textHMTL, "");
     });
@@ -72,12 +72,10 @@ void createWebServerRoutes() {
     //status data
     webServer.on("/status/data", []() {
       String string = "<html><link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' crossorigin='anonymous'><table style='width:400px'>";
-      string += "<tr><td>channel</td><td>mode</td><td>in</td><td>volts</td><td>out</td><td>volts</td></tr>";
+      string += "<tr><td>mode</td><td>in</td><td>volts</td><td>out</td><td>volts</td></tr>";
       for (int channel = 0; channel < 20; channel++) {
         string += "<tr>";
         string += "<td>";
-        string += (channel + 1);
-        string += "</td><td>";
         if (channelIsInput(channel)) {
           string += "/in/";
         } else {

@@ -2,18 +2,18 @@
 #include <pgmspace.h> //PROGMEM
 #include <OSCMessage.h> // dependency: https://github.com/CNMAT/OSC
 #include <Ticker.h>
-#include <Pixi.h>  // dependency: https://github.com/wolfgangfriedrich/Pixi_demo
+#include "Pixi.h"  // dependency: https://github.com/wolfgangfriedrich/Pixi_demo
 
 /**
- *  our pixi instance !
- */
+    our pixi instance !
+*/
 Pixi pixi;
 
 /**
- * timer for updating pixi
- * todo look at faster timers ?
- * https://github.com/esp8266/Arduino/blob/master/doc/libraries.md#ticker
- */
+   timer for updating pixi
+   todo look at faster timers ?
+   https://github.com/esp8266/Arduino/blob/master/doc/libraries.md#ticker
+*/
 Ticker ticker;
 
 // reset config in eeprom
@@ -23,8 +23,8 @@ boolean resetConfig = false;
 char* myName = "oscpixi-xxxx";
 
 /*
- * last time the timer ran. used to detect underruns
- */
+   last time the timer ran. used to detect underruns
+*/
 unsigned long lastTimer = 0;
 
 
@@ -41,13 +41,10 @@ void setup() {
   Serial.println(" starting.");
 
   //configuration
-  setupConfiguration(); 
+  setupConfiguration();
   loadConfiguration();
+  //printConfiguration();
 
-  //pixi
-  setupPixi();
-  setupTimer();
-  
   setupWifi();
   //delay(500);
   setupMDNS();
@@ -55,6 +52,10 @@ void setup() {
   createWebServerRoutes();
   startWebServer();
   setupRtpMidi();
+
+  //pixi
+  setupPixi();
+  setupTimer();
 }
 
 
@@ -72,19 +73,18 @@ void loop() {
 
 void inline onTimer() {
   unsigned long now = millis();
-  if (lastTimer != 0 && now - lastTimer > 2){
+  if (lastTimer != 0 && now - lastTimer > 2) {
     Serial.print("timer underrun. last run was ");
     Serial.print(now - lastTimer);
     Serial.println("ms ago.");
   }
   lastTimer = now;
-  
   updatePixi();
 }
 
 
 void setupTimer() {
-  ticker.attach_ms(1, onTimer);  
+  ticker.attach_ms(1, onTimer);
 }
 
 
