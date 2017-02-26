@@ -8,8 +8,8 @@ ESP8266WiFiMulti WiFiMulti;
 
 
 /**
- * general wifi setup
- */
+    general wifi setup
+*/
 void setupWifi() {
   if (!configuration.wifiAPMode) {
     //wifi client
@@ -41,27 +41,27 @@ void setupWifi() {
 
 
 /**
- * setup pixi as soft access point
- */
+    setup pixi as soft access point
+*/
 void setupWifiAP() {
-  Serial.print("Wifi in AP Mode SSID:");
+  Serial.print("Wifi in AP Mode. SSID:");
   Serial.print(myName);
-  Serial.print(" password:");
-  Serial.print(configuration.wifiAPPassword);
   boolean result = WiFi.softAP(myName, configuration.wifiAPPassword);
   if (result == true) {
+    Serial.print(" password:");
+    Serial.print(configuration.wifiAPPassword);
     Serial.print(" IP address: ");
-    Serial.println(WiFi.softAPIP() );
+    Serial.println(WiFi.softAPIP());
   } else {
-    Serial.println(": Failed!");
+    Serial.println(" Failed!");
   }
 }
 
 
 /**
- * setup bonjour/zeroconfig/mdns for
- * osc, web and rtp midi
- */
+   setup bonjour/zeroconfig/mdns for
+   osc, web and rtp/apple midi
+*/
 void setupMDNS() {
   if (!MDNS.begin(myName)) {
     Serial.println("Error setting up MDNS responder!");
@@ -69,26 +69,24 @@ void setupMDNS() {
     Serial.println("mDNS responder started");
     MDNS.addService("http", "tcp", 80);
     MDNS.addService("osc", "udp", 5000);
-    MDNS.addService("midi", "udp", 5004); //FIXME: apple protocol seems more complex.
+    MDNS.addService("apple-midi", "udp", 5004);
   }
 }
 
 
 /**
- * setup a unique name based on our name and mac address
- */
+   setup a unique name based on our name and mac address
+*/
 void setupUniqueName() {
-  //unique name
   uint8_t mac[WL_MAC_ADDR_LENGTH];
   WiFi.softAPmacAddress(mac);
   String macID = String(mac[WL_MAC_ADDR_LENGTH - 2], HEX) + String(mac[WL_MAC_ADDR_LENGTH - 1], HEX);
-  //Serial.print(mac);
   macID.toLowerCase();
-  String n = "oscpixi-" + macID;
+ String n = "oscpixi-" + macID;
   memset(myName, 0, n.length() + 1);
-  for (int i = 0; i < n.length()-1; i++)
+  for (int i = 0; i < n.length(); i++) {
     myName[i] = n.charAt(i);
-  myName[n.length()-1] = 0;
+  }
   WiFi.hostname(myName);
 }
 

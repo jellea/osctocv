@@ -1,42 +1,19 @@
-/*
-  TODO :
-  - general
-    - simpler mode mgmt
-    - config not saving bug ??
-    - dac not working
-    - adc ?
-    
-  - RTP MIDI
-    - default mappings
-    - web and readme help
-    - 14 bits midi cc support
-    - save config in flash
-    - load config from flash
-    - mdns discovery
-  - pixi
-    - LFOs
-    - tempo synced lfo
-    - trigger / gate detection
-    - cv in ->
-  - OSC
-    - sending message to remote host
-*/
 
 #include <pgmspace.h> //PROGMEM
 #include <OSCMessage.h> // dependency: https://github.com/CNMAT/OSC
 #include <Ticker.h>
-#include <Pixi.h>  // dependency: https://github.com/wolfgangfriedrich/Pixi_demo
+#include "Pixi.h"  // dependency: https://github.com/wolfgangfriedrich/Pixi_demo
 
 /**
     our pixi instance !
 */
 Pixi pixi;
 
-
 /**
- * timer for updating pixi
- * todo look at faster timers ?
- */
+   timer for updating pixi
+   todo look at faster timers ?
+   https://github.com/esp8266/Arduino/blob/master/doc/libraries.md#ticker
+*/
 Ticker ticker;
 
 // reset config in eeprom
@@ -45,14 +22,13 @@ boolean resetConfig = false;
 //used to build a unique named based on mac address
 char* myName = "oscpixi-xxxx";
 
-//will enable some Serial.print
-bool debug = true;
-
+/*
+   last time the timer ran. used to detect underruns
+*/
 unsigned long lastTimer = 0;
 
 
 void setup() {
-
   //basic stuff
   Serial.begin(115200);
   Serial.print("\n\n");
@@ -64,34 +40,22 @@ void setup() {
   Serial.print(myName);
   Serial.println(" starting.");
 
+  //configuration
+  setupConfiguration();
   loadConfiguration();
+  //printConfiguration();
+  //
 
   setupWifi();
-  delay(500);
   setupMDNS();
-  setupPixi();
+  setupOSCServer();
   createWebServerRoutes();
   startWebServer();
-  setupOSCServer();
   setupRtpMidi();
+
+  //pixi
+  setupPixi();
   setupTimer();
-}
-
-
-void inline onTimer() {
-  unsigned long now = millis();
-  if (lastTimer != 0 && now - lastTimer > 2){
-    Serial.print("timer underrun. last run was ");
-    Serial.print(now - lastTimer);
-    Serial.println("ms ago.");
-  }
-  lastTimer = now;
-  //
-  updatePixi();
-}
-
-void setupTimer() {
-  ticker.attach_ms(1, onTimer);
 }
 
 
@@ -105,6 +69,26 @@ void loop() {
   //save configuration if needed
   saveConfiguration(false);
 }
+
+
+void inline onTimer() {
+  unsigned long now = millis();
+  if (lastTimer != 0 && now - lastTimer > 3) {
+    Serial.print("timer underrun. last run was ");
+    Serial.print(now - lastTimer);
+    Serial.println("ms ago.");
+  }
+  lastTimer = now;
+  updatePixi();
+}
+
+
+void setupTimer() {
+  ticker.attach_ms(1, onTimer);
+}
+
+
+
 
 
 

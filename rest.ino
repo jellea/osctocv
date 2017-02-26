@@ -1,3 +1,5 @@
+// https://github.com/esp8266/Arduino
+// https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WebServer
 #include <ESP8266WebServer.h>
 
 ESP8266WebServer webServer(80);
@@ -8,7 +10,7 @@ const char restHTML[] PROGMEM = "<html>\n<title>OSCPixi</title>\n<link rel='styl
 const char wifiHTML[] PROGMEM = "<html>\n<title>OSCPixi</title>\n<link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' crossorigin='anonymous'>\n<div class='container' style='width:450px;margin20px;padding:20px'>\n \n  <nav class='navbar navbar-default'>\n   <div class='container-fluid'>\n     <div class='collapse navbar-collapse'>\n        <ul class='nav navbar-nav'>\n       <li><a href='/'>OSCPixi</a><li>\n       <li><a href='/rest'>Rest API</a></li>\n       <li class='active'><a href='/wifi'>WLAN</a></li>\n        <li><a href='/status'>Status</a></li>\n       </ul>\n     </div>\n    </div>\n  </nav>\n  \n  <form action='/wifi/config' target='wifioutput'>\n    <div class='form-group'>\n      <input type='radio' name='mode' id='mode1' value='client'/>&nbsp;<label for='mode1'>client</label>\n      <input type='radio' name='mode' id='mode2' value='pa'/>&nbsp;<label for='mode2'>access-point</label>\n    </div>\n    <div class='form-group'>\n      <label for='ssid'>ssid (client)</label>\n     <input name='mode' id='ssid'  class='form-control' placeholder='your router ssid'/>\n   </div>\n    <div class='form-group'>\n      <label for='password'>password (client)</label>\n     <input name='password' id='password'  class='form-control' placeholder='your router wifi password'/>\n    </div>\n    <input type='submit'/>\n  </form>\n \n  <iframe src='' name='wifioutput' style='border:none;width:250px;height:40px;'></iframe>\n \n  <p>\n   in Access Point mode you will find your device as 'oscpixi-XX' under the list of Wifi networks. \n    the wifi password in AP mode is 0101010101\n  </p>\n  <p>\n   If the device cannot connect to the specified access point as client, \n    it will fallback to access point mode.\n  </p>\n  \n</div>\n<html>";
 const char statusHTML[] PROGMEM = "<html>\n<title>OSCPixi</title>\n<link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' crossorigin='anonymous'>\n<div class='container' style='width:450px;margin20px;padding:20px'>\n \n  <nav class='navbar navbar-default'>\n   <div class='container-fluid'>\n     <div class='collapse navbar-collapse'>\n        <ul class='nav navbar-nav'>\n       <li><a href='/'>OSCPixi</a><li>\n       <li><a href='/rest'>Rest API</a></li>\n       <li><a href='/wifi'>WLAN</a></li>\n       <li class='active'><a href='/status'>Status</a></li>\n        </ul>\n     </div>\n    </div>\n  </nav>\n\n  \n  <iframe src='/status/data' name='' style='border:none;width:450px;height:400px;'></iframe>\n  \n  \n</div>\n<html>";
 
-//String constants stored in progmem/flash to save RAM
+// String constants stored in progmem/flash to save RAM
 const char textHMTL[] PROGMEM = "text/html";
 const char valueMustBeZeroOne[] PROGMEM = "value must be between 0 and 1";
 const char valueMustBeMinusOneOne[] PROGMEM = "value must be between -1 and 1";
@@ -46,35 +48,43 @@ void createWebServerRoutes() {
   if (configuration.restEnabled) {
 
     webServer.onNotFound(webServerSendHome);
-    
+
     webServer.on("/", []() {
       webServer.send_P(200, textHMTL, homeHTML);
     });
-    
+
     webServer.on("/rest", []() {
       webServer.send_P(200, textHMTL, restHTML);
     });
-    
+
     webServer.on("/wifi", []() {
       webServer.send_P(200, textHMTL, wifiHTML);
     });
-    
+
     webServer.on("/status", []() {
       webServer.send_P(200, textHMTL, statusHTML);
     });
-    
+
     webServer.on("/blank", []() {
       webServer.send_P(200, textHMTL, "");
     });
+
+    webServer.on("/debug", []() {
+      configuration.debug =  !configuration.debug;
+        String out = "debug: ";
+        out += configuration.debug?"on":"off";
+        configurationNeedsSave = true;
+        webServer.send(200, "text/html", out);
+    });
     
+
+    //status data
     webServer.on("/status/data", []() {
       String string = "<html><link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' crossorigin='anonymous'><table style='width:400px'>";
-      string += "<tr><td>channel</td><td>mode</td><td>in</td><td>volts</td><td>out</td><td>volts</td></tr>";
+      string += "<tr><td>mode</td><td>in</td><td>volts</td><td>out</td><td>volts</td></tr>";
       for (int channel = 0; channel < 20; channel++) {
         string += "<tr>";
         string += "<td>";
-        string += (channel + 1);
-        string += "</td><td>";
         if (channelIsInput(channel)) {
           string += "/in/";
         } else {
@@ -96,7 +106,7 @@ void createWebServerRoutes() {
           string += "<td>";
           string += configuration.channelLFOFrequencies[channel];
           string += "Hz</td>";
-          string += " </td>";
+          string += "</td>";
         }
         string += "</tr>\n";
       }
@@ -104,7 +114,7 @@ void createWebServerRoutes() {
       webServer.send(200, "text/html", string);
     });
 
-
+    
     // output endpoint
     webServer.on("/out", []() {
       String modee =  webServer.arg("mode");

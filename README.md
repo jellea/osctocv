@@ -1,10 +1,15 @@
 # oscpixi
 
-unipolar value are 0v to 10v
+oscpixi interfaces eurorack modular signals (cv, trigger, gate) with OSC, RTP MIDI and Rest APIs
 
-bipolar are -5v to +5v
+Physical input and output while unipolar are [0v, 10v], and when bipolar are [-5v, +5v].
+Input and Output values are converted from these range into [-1, 1] for bipolar and [0, 1] for unipolar in OSC and REST API
+and [0, 127] in MIDI CCs.
 
-API values are converted from these range into [-1, 1] for bipolar and [0, 1] for unipolar.
+LFO frequencies are in Hertz, ranging [0Hz, 10Hz]
+
+PWM value are between [0, 1].
+
 
 
 ## OSC API
@@ -13,27 +18,35 @@ OSC Port: `5000`
 
 ### Inputs
 
-`/in/<[1-20]>/<trig|gate|cvuni|cvbi> <ip> <port>`
+`/in/<[1-20]>/<mode> <ip> <port>`
+
+mode is one of : trig, gate, flipflop, cvuni, cvbi
 
 ### Outputs
 
-`/out/<[1-20]>/<trig|gate|cvuni|cvbi> <float>`
+`/out/<[1-20]>/<mode> <float>`
+
+mode is one of : trig, gate, flipflop, cvuni, cvbi, lfosine, lfosaw, lfotri, lfosquare
 
 ## REST API
 
 REST API Port: `80`
 
-on port 80. a welcome form help you to play with the api.
+A welcome form help you to play with the REST API.
 
 ### Inputs
 
-`/in?mode=<trig|gate|cvuni|cvbi>&index=<[1-20]>&ip=<ip>&port=<port>`
+`/in?mode=<mode>&index=<[1-20]>&ip=<ip>&port=<port>`
+
+mode is one of : trig, gate, flipflop, cvuni, cvbi
 
 ### Outputs
 
-`/out?mode=<trig|gate|cvuni|cvbi>&index=<[1-20]>&value=<float>`
+`/out?mode=<mode>&index=<[1-20]>&value=<float>`
 
-## RTP Midi API
+mode is one of : trig, gate, flipflop, cvuni, cvbi, lfosine, lfosaw, lfotri, lfosquare
+
+## RTP MIDI API
 
 RTP Midi Port: `5004`
 
