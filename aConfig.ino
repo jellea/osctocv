@@ -96,6 +96,7 @@ void loadConfiguration() {
     }
     saveConfiguration(true);
   }
+  configuration.debug=true;
 }
 
 
@@ -128,12 +129,13 @@ void printConfiguration() {
   Serial.print(sizeof(configuration));
   Serial.print(")");
   for (unsigned int t = 0; t < sizeof(configuration); t++) {
-    if (t % 50 == 0) {
+    if (t % 25 == 0) {
       Serial.println(" ");
     }
-    Serial.print( *((char*)&configuration + t) );
+    Serial.print( *((char*)&configuration + t), HEX);
     Serial.print(" ");
   }
+  Serial.println(" ");
 }
 
 

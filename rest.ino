@@ -69,6 +69,15 @@ void createWebServerRoutes() {
       webServer.send_P(200, textHMTL, "");
     });
 
+    webServer.on("/debug", []() {
+      configuration.debug =  !configuration.debug;
+        String out = "debug: ";
+        out += configuration.debug?"on":"off";
+        configurationNeedsSave = true;
+        webServer.send(200, "text/html", out);
+    });
+    
+
     //status data
     webServer.on("/status/data", []() {
       String string = "<html><link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' crossorigin='anonymous'><table style='width:400px'>";
@@ -105,7 +114,7 @@ void createWebServerRoutes() {
       webServer.send(200, "text/html", string);
     });
 
-
+    
     // output endpoint
     webServer.on("/out", []() {
       String modee =  webServer.arg("mode");

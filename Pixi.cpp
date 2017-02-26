@@ -265,7 +265,7 @@ word Pixi::configChannel( int channel, int channel_mode, word dac_dat, word rang
 /*
   Readout of raw register value for given temperature channel
 */
-word Pixi::readRawTemperature(int temp_channel)
+/*word Pixi::readRawTemperature(int temp_channel)
 {
   word result = 0;
 
@@ -273,7 +273,7 @@ word Pixi::readRawTemperature(int temp_channel)
 
   return (result);
 
-}
+}*/
 
 /*
   Readout of given temperature channel and conversion into degC float return value
@@ -310,18 +310,24 @@ float Pixi::readTemperature(int temp_channel)
 word Pixi::writeAnalog(int channel, word value)
 {
   word result = 0;
-  word channel_func = 0;
+  //word channel_func = 0;
 
-  channel_func = ReadRegister (  PIXI_PORT_CONFIG + channel, false );
-  channel_func = ( channel_func & FUNCID ) >> 12 ;
+  //channel_func = ReadRegister (  PIXI_PORT_CONFIG + channel, false );
+  //channel_func = ( channel_func & FUNCID ) >> 12 ;
 
-  if (channel_func == 5)
-  {
+  //if (channel_func == 5)
+  //{
     WriteRegister ( PIXI_DAC_DATA + channel, value );
     result = ReadRegister ( PIXI_DAC_DATA + channel, false );
-  }
+  //}
 
 
   return (result);
 };
 
+
+word Pixi::readAnalog(int channel)
+{
+  word result = 0;
+  return (ReadRegister ( PIXI_ADC_DATA + channel, false ));
+};

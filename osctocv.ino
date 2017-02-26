@@ -44,9 +44,9 @@ void setup() {
   setupConfiguration();
   loadConfiguration();
   //printConfiguration();
+  //
 
   setupWifi();
-  //delay(500);
   setupMDNS();
   setupOSCServer();
   createWebServerRoutes();
@@ -73,7 +73,7 @@ void loop() {
 
 void inline onTimer() {
   unsigned long now = millis();
-  if (lastTimer != 0 && now - lastTimer > 2) {
+  if (lastTimer != 0 && now - lastTimer > 3) {
     Serial.print("timer underrun. last run was ");
     Serial.print(now - lastTimer);
     Serial.println("ms ago.");

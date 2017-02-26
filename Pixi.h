@@ -244,11 +244,11 @@ class Pixi
 //    void readInterrupt();
     word readRawTemperature(int temp_channel);
     float readTemperature(int temp_channel);
-//    word readAnalog(int channel);
+    word readAnalog(int channel);
     word writeAnalog(int channel, word value);
-  private:
-    int _channel;
-    int _temp_channel;
+  //private:
+  //  int _channel;
+  //  int _temp_channel;
 };
 
 #endif  // PIXI_H

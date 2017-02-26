@@ -60,7 +60,7 @@ void setupWifiAP() {
 
 /**
    setup bonjour/zeroconfig/mdns for
-   osc, web and rtp midi
+   osc, web and rtp/apple midi
 */
 void setupMDNS() {
   if (!MDNS.begin(myName)) {
@@ -69,7 +69,7 @@ void setupMDNS() {
     Serial.println("mDNS responder started");
     MDNS.addService("http", "tcp", 80);
     MDNS.addService("osc", "udp", 5000);
-    MDNS.addService("midi", "udp", 5004); //FIXME: apple protocol seems more complex.
+    MDNS.addService("apple-midi", "udp", 5004);
   }
 }
 
@@ -78,18 +78,15 @@ void setupMDNS() {
    setup a unique name based on our name and mac address
 */
 void setupUniqueName() {
-  //unique name
   uint8_t mac[WL_MAC_ADDR_LENGTH];
   WiFi.softAPmacAddress(mac);
   String macID = String(mac[WL_MAC_ADDR_LENGTH - 2], HEX) + String(mac[WL_MAC_ADDR_LENGTH - 1], HEX);
-  //Serial.print(mac);
   macID.toLowerCase();
-  String n = "oscpixi-" + macID;
+ String n = "oscpixi-" + macID;
   memset(myName, 0, n.length() + 1);
-  for (int i = 0; i < n.length() - 1; i++) {
+  for (int i = 0; i < n.length(); i++) {
     myName[i] = n.charAt(i);
   }
-  myName[n.length() - 1] = 0;
   WiFi.hostname(myName);
 }
 

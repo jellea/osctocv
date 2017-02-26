@@ -146,7 +146,7 @@ void channelSetModeAndValue(int channel, int channelMode, float value, boolean f
       //build channel configuration
       //MAX3100 pdf page 43
       word channelMode = channelIsInput(channel) ? CH_MODE_ADC_P : CH_MODE_DAC_ADC_MON; //CH_MODE_DAC  CH_MODE_DAC_ADC_MON
-      word range = channelIsBipolar(channel) ? CH_5N_TO_5P : CH_0_TO_10P;
+      word range = channelIsBipolar(channel) ? CH_0_TO_10P : CH_0_TO_10P;// no -10v ref CH_5N_TO_5P
       pixi.WriteRegister(PIXI_PORT_CONFIG + channel,
                     (
                       ( (channelMode << 12 ) & FUNCID )
